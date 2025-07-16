@@ -2,34 +2,54 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Korfbal Setup</title>
-  <link rel="stylesheet" href="style.css"/>
+  <style>
+    .team-inputs {
+      margin-bottom: 20px;
+    }
+    .team-inputs label,
+    .team-inputs input {
+      display: block;
+      margin: 5px 0;
+    }
+    .styled-input {
+      padding: 8px;
+      font-size: 16px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  </style>
 </head>
 <body>
-  <main id="setupScreen">
-    <h1>Spelers aanmaken</h1>
-    <input type="text" id="playerName" placeholder="Naam speler"/>
-    <button id="addPlayerBtn">Toevoegen</button>
-    <h2>Gemaakte spelers</h2>
-    <ul id="playerList"></ul>
-    <h2>Toewijzen aan vakken</h2>
-    <div id="assignmentArea">
-      <div>
-        <h3>1e aanvalsvak</h3>
-        <ul id="vakAanval"></ul>
-      </div>
-      <div>
-        <h3>1e verdedigingsvak</h3>
-        <ul id="vakVerdediging"></ul>
-      </div>
-      <div>
-        <h3>Wissels</h3>
-        <ul id="vakWissels"></ul>
-      </div>
-    </div>
-    <button id="startGameBtn" disabled>Ga naar wedstrijd</button>
-  </main>
+  <h1>Korfbal Setup</h1>
+
+  <div class="team-inputs">
+    <label for="teamThuis">Team Thuis:</label>
+    <input type="text" id="teamThuis" placeholder="Naam thuisteam" class="styled-input" />
+
+    <label for="teamUit">Team Uit:</label>
+    <input type="text" id="teamUit" placeholder="Naam uitteam" class="styled-input" />
+  </div>
+
+  <h2>Spelers aanmaken</h2>
+  <input type="text" id="playerName" placeholder="Naam speler" />
+  <button id="addPlayerBtn">Toevoegen</button>
+
+  <h3>Gemaakte spelers</h3>
+  <ul id="playerList"></ul>
+
+  <h3>Toewijzen aan vakken</h3>
+  <h4>1e aanvalsvak</h4>
+  <ul id="vakAanval"></ul>
+
+  <h4>1e verdedigingsvak</h4>
+  <ul id="vakVerdediging"></ul>
+
+  <h4>Wissels</h4>
+  <ul id="vakWissels"></ul>
+
+  <button id="startGameBtn" disabled>Ga naar wedstrijd</button>
+
   <script src="script.js"></script>
 </body>
 </html>
