@@ -1,28 +1,132 @@
 <!DOCTYPE html>
+
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Korfbal Statistieken</title>
-  <link rel="stylesheet" href="style.css"/>
-</head>
+<meta charset="utf-8"/>
+<title>Korfbal Statistieken</title>
+<style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 30px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: center;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .back-link {
+            display: block;
+            margin-top: 30px;
+            text-align: center;
+        }
+    </style>
+<style>
+    .vak-tabel {
+        margin-bottom: 40px;
+    }
+    .vak-tabel th, .vak-tabel td {
+        padding: 10px;
+        text-align: center;
+    }
+    .vak-tabel th {
+        background-color: #007BFF;
+        color: white;
+    }
+    .vak-tabel td {
+        background-color: #f9f9f9;
+    }
+    .split-column {
+        border-left: 2px solid #ccc;
+    }
+</style></head>
 <body>
-  <main>
-    <h1>Statistieken</h1>
-    <p id="aanvalTellerStats"></p>
-    <table>
-      <thead>
-        <tr>
-          <th>Speler</th>
-          <th>Schoten</th>
-          <th>Doelpunten</th>
-          <th>Percentage</th>
-        </tr>
-      </thead>
-      <tbody id="statsTableBody"></tbody>
-    </table>
-    <a href="wedstrijd.html">Terug naar Wedstrijd</a>
-  </main>
-  <script src="script.js"></script>
-</body>
+<h1>Korfbal Statistieken</h1>
+
+<a class="back-link" href="wedstrijd.html">← Terug naar Wedstrijd</a>
+<script>
+        function laadStatistieken() {
+            const statistieken = JSON.parse(localStorage.getItem('statistieken')) || {};
+            const tbody = document.querySelector('#statistiekenTabel tbody');
+            tbody.innerHTML = '';
+
+            Object.keys(statistieken).forEach(speler => {
+                const data = statistieken[speler];
+                const rij = document.createElement('tr');
+
+                const schotPercVoor = data.doelpogingen_voor > 0 ? ((data.doelpunten_voor / data.doelpogingen_voor) * 100).toFixed(1) + '%' : '0%';
+                const schotPercTegen = data.doelpogingen_tegen > 0 ? ((data.doelpunten_tegen / data.doelpogingen_tegen) * 100).toFixed(1) + '%' : '0%';
+
+                rij.innerHTML = `
+                    <td>${speler}</td>
+                    <td>${data.doelpunten_voor || 0}</td>
+                    <td>${data.doelpogingen_voor || 0}</td>
+                    <td>${schotPercVoor}</td>
+                    <td>${data.doelpunten_tegen || 0}</td>
+                    <td>${data.doelpogingen_tegen || 0}</td>
+                    <td>${schotPercTegen}</td>
+                `;
+                tbody.appendChild(rij);
+            });
+        }
+
+        window.onload = laadStatistieken;
+    </script>
+<h2>1e Aanvalsvak</h2><table class="vak-tabel" id="tabel_1e_Aanvalsvak"><thead><tr><th>Speler</th><th>Doelpunten Voor</th><th>Doelpogingen Voor</th><th>Schotpercentage Voor</th><th class="split-column"></th><th>Doelpunten Tegen</th><th>Doelpogingen Tegen</th><th>Schotpercentage Tegen</th></tr></thead><tbody></tbody></table><h2>1e Verdedigingsvak</h2><table class="vak-tabel" id="tabel_1e_Verdedigingsvak"><thead><tr><th>Speler</th><th>Doelpunten Voor</th><th>Doelpogingen Voor</th><th>Schotpercentage Voor</th><th class="split-column"></th><th>Doelpunten Tegen</th><th>Doelpogingen Tegen</th><th>Schotpercentage Tegen</th></tr></thead><tbody></tbody></table><script>
+function laadStatistieken() {
+    const statistieken = JSON.parse(localStorage.getItem('statistieken')) || {};
+    const spelers = JSON.parse(localStorage.getItem('spelers')) || [];
+
+    const aanvalTbody = document.querySelector('#tabel_1e_Aanvalsvak tbody');
+    const verdedigingTbody = document.querySelector('#tabel_1e_Verdedigingsvak tbody');
+    aanvalTbody.innerHTML = '';
+    verdedigingTbody.innerHTML = '';
+
+    spelers.forEach(speler => {
+        const data = statistieken[speler.naam] || {
+            doelpunten_voor: 0,
+            doelpogingen_voor: 0,
+            doelpunten_tegen: 0,
+            doelpogingen_tegen: 0
+        };
+
+        const schotPercVoor = data.doelpogingen_voor > 0 ? ((data.doelpunten_voor / data.doelpogingen_voor) * 100).toFixed(1) + '%' : '0%';
+        const schotPercTegen = data.doelpogingen_tegen > 0 ? ((data.doelpunten_tegen / data.doelpogingen_tegen) * 100).toFixed(1) + '%' : '0%';
+
+        const rij = document.createElement('tr');
+        rij.innerHTML = `
+            <td>${speler.naam}</td>
+            <td>${data.doelpunten_voor}</td>
+            <td>${data.doelpogingen_voor}</td>
+            <td>${schotPercVoor}</td>
+            <td class="split-column"></td>
+            <td>${data.doelpunten_tegen}</td>
+            <td>${data.doelpogingen_tegen}</td>
+            <td>${schotPercTegen}</td>
+        `;
+
+        if (speler.vak === 'A') {
+            aanvalTbody.appendChild(rij);
+        } else if (speler.vak === 'B') {
+            verdedigingTbody.appendChild(rij);
+        }
+    });
+}
+window.onload = laadStatistieken;
+</script></body>
 </html>
