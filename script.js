@@ -11,15 +11,6 @@ let geselecteerdeSpeler = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.includes("wedstrijd.html")) {
-    // === Ophalen van teamnamen in wedstrijdscherm ===
-    const teamThuis = localStorage.getItem("teamThuis") || "Team Thuis";
-    const teamUit = localStorage.getItem("teamUit") || "Team Uit";
-
-    function toonStand() {
-      document.getElementById("standContainer").textContent =
-        `Stand: ${teamThuis} ${doelpunten.A} - ${teamUit} ${doelpunten.B}`;
-    }
-
     initWedstrijd();
   } else if (window.location.pathname.includes("statistieken.html")) {
     initStatistieken();
@@ -27,6 +18,90 @@ document.addEventListener("DOMContentLoaded", () => {
     initSetup();
   }
 });
+
+function initSetup() {
+  const teamThuisInput = document.getElementById("teamThuis");
+  const teamUitInput = document.getElementById("teamUit");
+  const playerNameInput = document.getElementById("playerName");
+  const addPlayerBtn = document.getElementById("addPlayerBtn");
+  const playerList = document.getElementById("playerList");
+  const vakAanval = document.getElementById("vakAanval");
+  const vakVerdediging = document.getElementById("vakVerdediging");
+  const vakWissels = document.getElementById("vakWissels");
+  const startGameBtn = document.getElementById("startGameBtn");
+
+  let spelers = [];
+
+  addPlayerBtn.onclick = () => {
+    const naam = playerNameInput.value.trim();
+    if (!naam) return;
+    const id = Date.now();
+    spelers.push({ id, naam, vak: null });
+    playerNameInput.value = "";
+    toonSpelers();
+  };
+
+  function toonSpelers() {
+    playerList.innerHTML = "";
+    spelers.forEach(speler => {
+      const li = document.createElement("li");
+      li.textContent = speler.naam;
+
+      const btnAanval = document.createElement("button");
+      btnAanval.textContent = "Aanvalsvak";
+      btnAanval.onclick = () => toewijzen(speler.id, "aanval");
+
+      const btnVerdediging = document.createElement("button");
+      btnVerdediging.textContent = "Verdedigingsvak";
+      btnVerdediging.onclick = () => toewijzen(speler.id, "verdediging");
+
+      const btnWissel = document.createElement("button");
+      btnWissel.textContent = "Wissels";
+      btnWissel.onclick = () => toewijzen(speler.id, "wissel");
+
+      li.appendChild(btnAanval);
+      li.appendChild(btnVerdediging);
+      li.appendChild(btnWissel);
+      playerList.appendChild(li);
+    });
+    toonVakken();
+    controleerStartknop();
+  }
+
+  function toewijzen(id, vak) {
+    spelers = spelers.map(speler => {
+      if (speler.id === id) return { ...speler, vak };
+      return speler;
+    });
+    toonSpelers();
+  }
+
+  function toonVakken() {
+    vakAanval.innerHTML = "";
+    vakVerdediging.innerHTML = "";
+    vakWissels.innerHTML = "";
+    spelers.forEach(speler => {
+      const li = document.createElement("li");
+      li.textContent = speler.naam;
+      if (speler.vak === "aanval") vakAanval.appendChild(li);
+      else if (speler.vak === "verdediging") vakVerdediging.appendChild(li);
+      else if (speler.vak === "wissel") vakWissels.appendChild(li);
+    });
+  }
+
+  function controleerStartknop() {
+    const aanvalCount = spelers.filter(s => s.vak === "aanval").length;
+    const verdedigingCount = spelers.filter(s => s.vak === "verdediging").length;
+    startGameBtn.disabled = !(aanvalCount === 4 && verdedigingCount === 4);
+  }
+
+  startGameBtn.onclick = () => {
+    localStorage.setItem("spelers", JSON.stringify(spelers));
+    localStorage.setItem("teamThuis", teamThuisInput.value.trim());
+    localStorage.setItem("teamUit", teamUitInput.value.trim());
+    window.location.href = "wedstrijd.html";
+  };
+}
 
 // === SETUP SCHERM ===
 function initSetup() {
