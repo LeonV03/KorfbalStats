@@ -67,22 +67,7 @@
     }
   </style>
 </head>
-<body onload="initWedstrijd()"><button id="menuButton">Open Menu</button><div id="menu" style="display:none;">
-<h3>Wisselmenu</h3>
-<div>
-<label>Wissels:</label>
-<select id="wisselsSelect"></select>
-</div>
-<div>
-<label>1e Aanvalsvak:</label>
-<select id="aanvalSelect"></select>
-</div>
-<div>
-<label>1e Verdedigingsvak:</label>
-<select id="verdedigingSelect"></select>
-</div>
-<button onclick="wisselSpelers()">Wissel</button>
-</div>
+<body onload="initWedstrijd()">
 <header>
 <button id="wisselBtn">Wissels</button>
 <a href="statistieken.html" id="statsBtn">Statistieken →</a>
@@ -101,11 +86,7 @@
 <h3>1e Verdedigingsvak</h3>
 <ul id="verdedigingSpelers"></ul>
 </div>
-<div class="vak" id="wisselVak">
-<h3>Wissels</h3>
-<ul id="wisselSpelers"></ul>
-</div>
-</div>
+</div><div id="actieveSpelersContainer" style="margin: 1rem 0; padding: 1rem; background-color: #ffffff; border-radius: 8px;"><h3>Spelers in actief vak</h3><ul id="actieveSpelers"></ul></div>
 <script>
     document.addEventListener("DOMContentLoaded", () => {
       const spelers = JSON.parse(localStorage.getItem("spelers")) || [];
@@ -133,46 +114,37 @@
   </script>
 <script src="script.js"></script>
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const aanvalVak = document.getElementById("aanvalVak");
-    const verdedigingVak = document.getElementById("verdedigingVak");
-    const wisselsSelect = document.getElementById("wisselsSelect");
-    const aanvalSelect = document.getElementById("aanvalSelect");
-    const verdedigingSelect = document.getElementById("verdedigingSelect");
+function updateActieveSpelers() {
+    const spelers = JSON.parse(localStorage.getItem("spelers")) || [];
+    const actiefVak = localStorage.getItem("actiefVak") || "A";
+    const actieveSpelersList = document.getElementById("actieveSpelers");
+    actieveSpelersList.innerHTML = "";
 
-    const spelers = JSON.parse(localStorage.getItem("spelers") || "[]");
-
-    spelers.forEach(speler => {
-        const option = new Option(speler.naam, speler.naam);
-        if (speler.vak === "aanval") {
-            aanvalVak.appendChild(document.createElement("li")).textContent = speler.naam;
-            aanvalSelect.appendChild(option.cloneNode(true));
-        } else if (speler.vak === "verdediging") {
-            verdedigingVak.appendChild(document.createElement("li")).textContent = speler.naam;
-            verdedigingSelect.appendChild(option.cloneNode(true));
-        } else {
-            wisselsSelect.appendChild(option.cloneNode(true));
-        }
+    const vakNaam = actiefVak === "A" ? "aanval" : "verdediging";
+    spelers.filter(speler => speler.vak === vakNaam).forEach(speler => {
+        const li = document.createElement("li");
+        li.textContent = speler.naam;
+        actieveSpelersList.appendChild(li);
     });
-
-    document.getElementById("menuButton").addEventListener("click", function() {
-        const menu = document.getElementById("menu");
-        menu.style.display = menu.style.display === "none" ? "block" : "none";
-    });
-});
-
-function wisselSpelers() {
-    const wissel = document.getElementById("wisselsSelect").value;
-    const aanval = document.getElementById("aanvalSelect").value;
-    const verdediging = document.getElementById("verdedigingSelect").value;
-
-    if (wissel && aanval) {
-        alert(`Wissel ${wissel} met ${aanval}`);
-    } else if (wissel && verdediging) {
-        alert(`Wissel ${wissel} met ${verdediging}`);
-    } else {
-        alert("Selecteer een wissel en een speler uit een vak.");
-    }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateActieveSpelers();
+    document.getElementById("wisselBtn").addEventListener("click", () => {
+        // wisselmenu logica
+    });
+    const balKnop = document.createElement("button");
+    balKnop.textContent = "Bal naar andere kant";
+    balKnop.style = "display:block;margin:1rem auto;padding:0.5rem 1rem;";
+    balKnop.addEventListener("click", () => {
+        const huidig = localStorage.getItem("actiefVak") || "A";
+        const nieuw = huidig === "A" ? "B" : "A";
+        localStorage.setItem("actiefVak", nieuw);
+        document.getElementById("eersteAanvalsvak").classList.toggle("actief", nieuw === "A");
+        document.getElementById("eersteVerdedigingsvak").classList.toggle("actief", nieuw === "B");
+        updateActieveSpelers();
+    });
+    document.body.appendChild(balKnop);
+});
 </script></body>
 </html>
