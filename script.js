@@ -99,6 +99,19 @@ function initSetup() {
 }
 
 // === WEDSTRIJD SCHERM ===
+let spelers = JSON.parse(localStorage.getItem("spelers")) || [];
+let actiefVak = "A";
+let aanvallen = { A: 0, B: 0 };
+let doelpunten = { A: 0, B: 0 };
+let doelpuntenTeller = 0;
+let geselecteerdeSpeler = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (window.location.pathname.includes("wedstrijd.html")) {
+    initWedstrijd();
+  }
+});
+
 function initWedstrijd() {
   toonActiefVak();
   toonStand();
@@ -106,7 +119,9 @@ function initWedstrijd() {
   document.getElementById("switchVakBtn").onclick = wisselVak;
   document.getElementById("goalBtn").onclick = () => registreerActie("doelpunt");
   document.getElementById("shotBtn").onclick = () => registreerActie("schot");
-  document.getElementById("wisselBtn").onclick = openWisselOverzicht;
+  document.getElementById("statsBtn").onclick = () => {
+    window.location.href = "statistieken.html";
+  };
 }
 
 function toonActiefVak() {
@@ -157,12 +172,13 @@ function registreerActie(type) {
     return speler;
   });
 
+  localStorage.setItem("spelers", JSON.stringify(spelers));
+
   if (type === "doelpunt" && doelpuntenTeller % 2 === 0) {
     wisselFunctie();
   }
 
   geselecteerdeSpeler = null;
-  localStorage.setItem("spelers", JSON.stringify(spelers));
   toonActiefVak();
   toonStand();
 }
@@ -171,7 +187,6 @@ function wisselVak() {
   actiefVak = actiefVak === "A" ? "B" : "A";
   aanvallen[actiefVak]++;
   toonActiefVak();
-  toonStand();
 }
 
 function wisselFunctie() {
@@ -180,33 +195,6 @@ function wisselFunctie() {
     if (speler.vak === "verdediging") return { ...speler, vak: "aanval" };
     return speler;
   });
-}
-
-function openWisselOverzicht() {
-  const overzicht = spelers.reduce((acc, speler) => {
-    acc[speler.vak] = acc[speler.vak] || [];
-    acc[speler.vak].push(speler.naam);
-    return acc;
-  }, {});
-
-  let tekst = "";
-  tekst += `Vak A: ${(overzicht.aanval || []).join(", ")}\n`;
-  tekst += `Vak B: ${(overzicht.verdediging || []).join(", ")}\n`;
-  tekst += `Wissels: ${(overzicht.wissel || []).join(", ")}`;
-
-  const keuze = prompt(`${tekst}\n\nTyp de naam van de speler die je wilt wisselen:`);
-
-  if (keuze) {
-    const speler = spelers.find(s => s.naam === keuze.trim());
-    if (speler) {
-      const nieuwVak = prompt(`Waarheen? aanval/verdediging/wissel`);
-      if (["aanval", "verdediging", "wissel"].includes(nieuwVak)) {
-        speler.vak = nieuwVak;
-        localStorage.setItem("spelers", JSON.stringify(spelers));
-        toonActiefVak();
-      }
-    }
-  }
 }
 
 // === STATISTIEKEN SCHERM ===
