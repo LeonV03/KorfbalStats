@@ -1,0 +1,108 @@
+
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Wedstrijd Uitgebreid</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f5;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    .veld-container {
+      position: relative;
+      width: 600px;
+      height: 400px;
+      margin: 20px auto;
+      background-color: #cce5cc;
+      border: 2px solid #333;
+      border-radius: 10px;
+    }
+
+    .zone {
+      position: absolute;
+      border: 1px dashed #444;
+      cursor: pointer;
+      opacity: 0.3;
+    }
+
+    .zone:hover {
+      opacity: 0.6;
+      background-color: #ffcc00;
+    }
+
+    #log {
+      margin-top: 20px;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      background: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      height: 150px;
+      overflow-y: auto;
+      border: 1px solid #ccc;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    .controls button {
+      margin: 5px;
+      padding: 10px 15px;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Wedstrijdregistratie - Uitgebreid</h1>
+
+  <div class="controls">
+    <label>Actie:</label>
+    <select id="actieSelect">
+      <option value="schot">Schotpoging</option>
+      <option value="doelpunt">Doelpunt</option>
+      <option value="balverlies">Balverlies</option>
+    </select>
+  </div>
+
+  <div class="veld-container" id="veld">
+    <!-- Zones op het veld -->
+    <div class="zone" data-zone="linksboven" style="top: 20px; left: 20px; width: 150px; height: 150px;"></div>
+    <div class="zone" data-zone="rechtsboven" style="top: 20px; right: 20px; width: 150px; height: 150px;"></div>
+    <div class="zone" data-zone="linksonder" style="bottom: 20px; left: 20px; width: 150px; height: 150px;"></div>
+    <div class="zone" data-zone="rechtsonder" style="bottom: 20px; right: 20px; width: 150px; height: 150px;"></div>
+    <div class="zone" data-zone="midden" style="top: 125px; left: 225px; width: 150px; height: 150px;"></div>
+  </div>
+
+  <div id="log"><strong>Actielog:</strong><br /></div>
+
+  <script>
+    const zones = document.querySelectorAll('.zone');
+    const log = document.getElementById('log');
+    const actieSelect = document.getElementById('actieSelect');
+
+    zones.forEach(zone => {
+      zone.addEventListener('click', () => {
+        const actie = actieSelect.value;
+        const locatie = zone.getAttribute('data-zone');
+        const tijd = new Date().toLocaleTimeString();
+        const bericht = tijd + " - " + actie + " vanuit " + locatie;
+        const p = document.createElement('div');
+        p.textContent = bericht;
+        log.appendChild(p);
+        log.scrollTop = log.scrollHeight;
+      });
+    });
+  </script>
+</body>
+</html>
