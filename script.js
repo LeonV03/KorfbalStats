@@ -10,16 +10,6 @@ let doelpuntenTeller = 0;
 let geselecteerdeSpeler = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (window.location.pathname.includes("wedstrijd.html")) {
-    initWedstrijd();
-  } else if (window.location.pathname.includes("statistieken.html")) {
-    initStatistieken();
-  } else {
-    initSetup();
-  }
-});
-
-function initSetup() {
   const teamThuisInput = document.getElementById("teamThuis");
   const teamUitInput = document.getElementById("teamUit");
   const playerNameInput = document.getElementById("playerName");
@@ -29,8 +19,24 @@ function initSetup() {
   const vakVerdediging = document.getElementById("vakVerdediging");
   const vakWissels = document.getElementById("vakWissels");
   const startGameBtn = document.getElementById("startGameBtn");
+  const modeEenvoudigBtn = document.getElementById("modeEenvoudig");
+  const modeUitgebreidBtn = document.getElementById("modeUitgebreid");
 
   let spelers = [];
+
+  function updateModeSelection(mode) {
+    localStorage.setItem("statistiekmodus", mode);
+    modeEenvoudigBtn.classList.remove("selected");
+    modeUitgebreidBtn.classList.remove("selected");
+    if (mode === "eenvoudig") {
+      modeEenvoudigBtn.classList.add("selected");
+    } else {
+      modeUitgebreidBtn.classList.add("selected");
+    }
+  }
+
+  modeEenvoudigBtn.onclick = () => updateModeSelection("eenvoudig");
+  modeUitgebreidBtn.onclick = () => updateModeSelection("uitgebreid");
 
   addPlayerBtn.onclick = () => {
     const naam = playerNameInput.value.trim();
@@ -39,11 +45,24 @@ function initSetup() {
     spelers.push({ id, naam, vak: null });
     playerNameInput.value = "";
     toonSpelers();
+    toonVakken();
+    controleerStartknop();
   };
 
   function verwijderSpeler(id) {
     spelers = spelers.filter(speler => speler.id !== id);
     toonSpelers();
+    toonVakken();
+    controleerStartknop();
+  }
+
+  function toewijsVak(id, vak) {
+    spelers = spelers.map(speler => {
+      if (speler.id === id) return { ...speler, vak };
+      return speler;
+    });
+    toonVakken();
+    controleerStartknop();
   }
 
   function toonSpelers() {
@@ -52,58 +71,44 @@ function initSetup() {
       const li = document.createElement("li");
       li.textContent = speler.naam;
 
-      const acties = document.createElement("div");
-      acties.className = "player-actions";
-
       const btnAanval = document.createElement("button");
       btnAanval.textContent = "Aanval";
-      btnAanval.onclick = () => toewijzen(speler.id, "aanval");
+      btnAanval.onclick = () => toewijsVak(speler.id, "aanval");
 
       const btnVerdediging = document.createElement("button");
       btnVerdediging.textContent = "Verdediging";
-      btnVerdediging.onclick = () => toewijzen(speler.id, "verdediging");
+      btnVerdediging.onclick = () => toewijsVak(speler.id, "verdediging");
 
       const btnWissel = document.createElement("button");
       btnWissel.textContent = "Wissel";
-      btnWissel.onclick = () => toewijzen(speler.id, "wissel");
+      btnWissel.onclick = () => toewijsVak(speler.id, "wissel");
 
-      const btnVerwijder = document.createElement("button");
-      btnVerwijder.textContent = "Verwijder";
-      btnVerwijder.onclick = () => verwijderSpeler(speler.id);
+      const verwijderBtn = document.createElement("button");
+      verwijderBtn.textContent = "✖";
+      verwijderBtn.className = "verwijder-knop";
+      verwijderBtn.onclick = () => verwijderSpeler(speler.id);
 
-      acties.appendChild(btnAanval);
-      acties.appendChild(btnVerdediging);
-      acties.appendChild(btnWissel);
-      acties.appendChild(btnVerwijder);
-      li.appendChild(acties);
+      li.appendChild(btnAanval);
+      li.appendChild(btnVerdediging);
+      li.appendChild(btnWissel);
+      li.appendChild(verwijderBtn);
       playerList.appendChild(li);
     });
-    toonVakken();
-    controleerStartknop();
-  }
-
-  function toewijzen(id, vak) {
-    spelers = spelers.map(speler => {
-      if (speler.id === id) return { ...speler, vak };
-      return speler;
-    });
-    toonSpelers();
   }
 
   function toonVakken() {
     vakAanval.innerHTML = "";
     vakVerdediging.innerHTML = "";
     vakWissels.innerHTML = "";
-
     spelers.forEach(speler => {
+      if (!speler.vak) return;
       const li = document.createElement("li");
       li.textContent = speler.naam;
-
-      const btnVerwijder = document.createElement("button");
-      btnVerwijder.textContent = "Verwijder";
-      btnVerwijder.onclick = () => verwijderSpeler(speler.id);
-      li.appendChild(btnVerwijder);
-
+      const verwijderBtn = document.createElement("button");
+      verwijderBtn.textContent = "✖";
+      verwijderBtn.className = "verwijder-knop";
+      verwijderBtn.onclick = () => verwijderSpeler(speler.id);
+      li.appendChild(verwijderBtn);
       if (speler.vak === "aanval") vakAanval.appendChild(li);
       else if (speler.vak === "verdediging") vakVerdediging.appendChild(li);
       else if (speler.vak === "wissel") vakWissels.appendChild(li);
@@ -120,9 +125,11 @@ function initSetup() {
     localStorage.setItem("spelers", JSON.stringify(spelers));
     localStorage.setItem("teamThuis", teamThuisInput.value.trim());
     localStorage.setItem("teamUit", teamUitInput.value.trim());
-    window.location.href = "wedstrijd.html";
+    const mode = localStorage.getItem("statistiekmodus") || "eenvoudig";
+    const url = mode === "uitgebreid" ? "wedstrijd_uitgebreid.html" : "wedstrijd.html";
+    window.location.href = url;
   };
-}
+});
 
 // === SETUP SCHERM ===
 function initSetup() {
