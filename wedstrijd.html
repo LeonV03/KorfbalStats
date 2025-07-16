@@ -1,35 +1,26 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Korfbal Wedstrijd</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wedstrijd</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main id="gameScreen">
-    <button id="switchVakBtn" class="switchVakBtn">Bal naar andere vak</button>
-    
-    <div class="wedstrijdContainer">
-      <div class="spelerKolom">
-        <h2 id="actiefVakLabel"></h2>
-        <div id="spelersVak" class="vakContainer"></div>
-        <div id="wisselContainer">
-          <button id="wisselBtn">Wissels</button>
-        </div>
-        <div id="standContainer"></div>
-      </div>
+  <main>
+    <h1>Wedstrijdregistratie</h1>
+    <p id="actiefVakLabel"></p>
+    <p id="standContainer"></p>
 
-      <div class="veldKolom">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Korfbalveld_outdoor.png/320px-Korfbalveld_outdoor.png" alt="Korfbalveld" class="veldAfbeelding"/>
-        <div class="actieKnoppen">
-          <button id="goalBtn">Doelpunt</button>
-          <button id="shotBtn">Schot</button>
-        </div>
-      </div>
+    <div id="spelersVak" class="spelers-container"></div>
+
+    <div class="actie-knoppen">
+      <button id="goalBtn" class="actie-doelpunt">Doelpunt</button>
+      <button id="shotBtn" class="actie-schot">Schotpoging</button>
+      <button id="switchVakBtn">Wissel Vak</button>
+      <button id="statsBtn">Bekijk Statistieken</button>
     </div>
   </main>
-
   <script src="script.js"></script>
 </body>
 </html>
