@@ -1,100 +1,173 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
-  <meta charset="UTF-8" />
-  <title>Wedstrijd</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      padding: 20px;
-      text-align: center;
-    }
-
-    h1 {
-      color: #333;
-    }
-
-    .scoreboard {
-      background-color: #ffffff;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      display: inline-block;
-      padding: 20px 40px;
-      margin-bottom: 30px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-
-    .scoreboard h2 {
-      margin: 0 0 10px;
-      font-size: 24px;
-    }
-
-    .score {
-      font-size: 32px;
-      font-weight: bold;
-      color: #0077cc;
-    }
-
-    .vak-container {
-      margin: 20px 0;
-    }
-
-    #spelersVak button {
-      margin: 5px;
-      padding: 10px 15px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      background-color: #e0e0e0;
-      cursor: pointer;
-    }
-
-    #spelersVak button.geselecteerd {
-      background-color: #0077cc;
-      color: white;
-    }
-
-    button {
-      margin: 10px;
-      padding: 10px 20px;
-      font-size: 16px;
-      border: none;
-      border-radius: 5px;
-      background-color: #0077cc;
-      color: white;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #005fa3;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Wedstrijdregistratie</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+        #scoreboard {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+        #scoreboard span {
+            margin: 0 20px;
+        }
+        #vakStatus {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+        #spelersContainer {
+            margin-top: 30px;
+        }
+        .speler {
+            margin-bottom: 15px;
+        }
+        .speler button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .goal {
+            background-color: lightgreen;
+        }
+        .shot {
+            background-color: lightcoral;
+        }
+    </style>
 </head>
 <body>
-  <h1>Wedstrijdregistratie</h1>
 
-  <div class="scoreboard">
-    <h2 id="wedstrijdTitel">Team Thuis vs Team Uit</h2>
-    <div class="score" id="standContainer">Stand: 0 - 0</div>
-  </div>
+    <h1>Wedstrijdregistratie</h1>
+    <div id="scoreboard">
+        <span>Team Thuis</span>
+        <span>0 - 0</span>
+        <span>Team Uit</span>
+    </div>
+    <div id="vakStatus">Vak A - Aanval</div>
 
-  <div class="vak-container">
-    <h3 id="actiefVakLabel">Actief vak: A</h3>
-    <div id="spelersVak"></div>
-  </div>
+    <button onclick="wisselVak()">Bal naar ander vak</button>
 
-  <button id="switchVakBtn">Wissel vak</button>
-  <button id="goalBtn">Doelpunt</button>
-  <button id="shotBtn">Schotpoging</button>
-  <button id="statsBtn">Bekijk Statistieken</button>
+    <div id="spelersContainer">
+        <!-- Spelers worden hier dynamisch geladen -->
+    </div>
 
-  <script>
-    // Ophalen van teamnamen en tonen in de titel
-    const teamThuis = localStorage.getItem("teamThuis") || "Team Thuis";
-    const teamUit = localStorage.getItem("teamUit") || "Team Uit";
-    document.getElementById("wedstrijdTitel").textContent = `${teamThuis} vs ${teamUit}`;
-  </script>
-  <script src="script.js"></script>
+    <script>
+        let teamThuis = localStorage.getItem('teamThuis') || 'Team Thuis';
+        let teamUit = localStorage.getItem('teamUit') || 'Team Uit';
+        let spelers = JSON.parse(localStorage.getItem('spelers')) || [];
+        let statistieken = JSON.parse(localStorage.getItem('statistieken')) || {};
+        let scoreThuis = 0;
+        let scoreUit = 0;
+        let huidigVak = 'A';
+        let functieA = 'aanval';
+        let functieB = 'verdediging';
+        let doelpuntenInVak = 0;
+
+        function updateScoreboard() {
+            document.getElementById('scoreboard').innerHTML = `<span>${teamThuis}</span><span>${scoreThuis} - ${scoreUit}</span><span>${teamUit}</span>`;
+        }
+
+        function updateVakStatus() {
+            const functie = huidigVak === 'A' ? functieA : functieB;
+            document.getElementById('vakStatus').innerText = `Vak ${huidigVak} - ${functie.charAt(0).toUpperCase() + functie.slice(1)}`;
+        }
+
+        function laadSpelers() {
+            const container = document.getElementById('spelersContainer');
+            container.innerHTML = '';
+            const vakSpelers = spelers.filter(s => s.vak === huidigVak);
+            vakSpelers.forEach(speler => {
+                const spelerDiv = document.createElement('div');
+                spelerDiv.className = 'speler';
+                const naamLabel = document.createElement('span');
+                naamLabel.innerText = speler.naam + ": ";
+                spelerDiv.appendChild(naamLabel);
+
+                const goalBtn = document.createElement('button');
+                goalBtn.innerText = 'Doelpunt';
+                goalBtn.className = 'goal';
+                goalBtn.onclick = () => registreerActie(speler.naam, 'doelpunt');
+                spelerDiv.appendChild(goalBtn);
+
+                const pogingBtn = document.createElement('button');
+                pogingBtn.innerText = 'Doelpoging';
+                pogingBtn.className = 'shot';
+                pogingBtn.onclick = () => registreerActie(speler.naam, 'doelpoging');
+                spelerDiv.appendChild(pogingBtn);
+
+                container.appendChild(spelerDiv);
+            });
+        }
+
+        function registreerActie(speler, type) {
+            if (!statistieken[speler]) {
+                statistieken[speler] = {
+                    doelpunten_voor: 0,
+                    doelpogingen_voor: 0,
+                    doelpunten_tegen: 0,
+                    doelpogingen_tegen: 0
+                };
+            }
+
+            const functie = huidigVak === 'A' ? functieA : functieB;
+            const isAanval = functie === 'aanval';
+
+            if (type === 'doelpunt') {
+                if (isAanval) {
+                    statistieken[speler].doelpunten_voor++;
+                    statistieken[speler].doelpogingen_voor++;
+                    if (functieA === 'aanval') scoreThuis++; else scoreUit++;
+                } else {
+                    statistieken[speler].doelpunten_tegen++;
+                    statistieken[speler].doelpogingen_tegen++;
+                    if (functieA === 'verdediging') scoreThuis++; else scoreUit++;
+                }
+                doelpuntenInVak++;
+                wisselVakNaDoelpunt();
+            } else if (type === 'doelpoging') {
+                if (isAanval) {
+                    statistieken[speler].doelpogingen_voor++;
+                } else {
+                    statistieken[speler].doelpogingen_tegen++;
+                }
+            }
+
+            localStorage.setItem('statistieken', JSON.stringify(statistieken));
+            updateScoreboard();
+        }
+
+        function wisselVakNaDoelpunt() {
+            wisselVak();
+            if (doelpuntenInVak >= 2) {
+                doelpuntenInVak = 0;
+                const temp = functieA;
+                functieA = functieB;
+                functieB = temp;
+            }
+            updateVakStatus();
+            laadSpelers();
+        }
+
+        function wisselVak() {
+            huidigVak = huidigVak === 'A' ? 'B' : 'A';
+            updateVakStatus();
+            laadSpelers();
+        }
+
+        window.onload = function() {
+            updateScoreboard();
+            updateVakStatus();
+            laadSpelers();
+        };
+    </script>
+
 </body>
 </html>
