@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Korfbal Statistieken</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Korfbal Statistieken</h1>
+        <button id="toggleMode">Wissel naar Uitgebreid</button>
+    </header>
+    <main>
+        <section id="basicStats">
+            <h2>Basisregistratie</h2>
+            <div class="stat-block">
+                <label>Doelpunten:</label>
+                <button onclick="increment('goals')">+</button>
+                <span id="goals">0</span>
+            </div>
+            <div class="stat-block">
+                <label>Shotpogingen:</label>
+                <button onclick="increment('shots')">+</button>
+                <span id="shots">0</span>
+            </div>
+            <div class="stat-block">
+                <label>Aanvallen:</label>
+                <button onclick="increment('attacks')">+</button>
+                <span id="attacks">0</span>
+            </div>
+            <div class="stat-block">
+                <label>Balverlies:</label>
+                <button onclick="increment('turnovers')">+</button>
+                <span id="turnovers">0</span>
+            </div>
+            <div class="stat-block">
+                <button onclick="calculatePercentages()">Bereken Percentages</button>
+                <div id="percentages"></div>
+            </div>
+        </section>
+
+        <section id="advancedStats" class="hidden">
+            <h2>Uitgebreide registratie</h2>
+            <p>Klik op het veld om een schotlocatie vast te leggen.</p>
+            <div id="court" onclick="addShot(event)">
+                <!-- Hier kun je een veldafbeelding plaatsen als achtergrond via CSS -->
+            </div>
+            <ul id="shotList"></ul>
+        </section>
+    </main>
+    <footer>
+        <button onclick="saveStats()">Opslaan</button>
+        <button onclick="loadStats()">Laden</button>
+        <button onclick="resetStats()">Reset</button>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
