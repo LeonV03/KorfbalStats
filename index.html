@@ -4,51 +4,145 @@
   <meta charset="UTF-8" />
   <title>Korfbal Setup</title>
   <style>
-    .team-inputs {
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1, h2, h3, h4 {
+      color: #333;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    .input-group {
       margin-bottom: 20px;
     }
-    .team-inputs label,
-    .team-inputs input {
+
+    label {
       display: block;
-      margin: 5px 0;
+      margin-bottom: 5px;
+      font-weight: bold;
     }
-    .styled-input {
-      padding: 8px;
-      font-size: 16px;
+
+    input[type="text"] {
       width: 100%;
+      padding: 10px;
+      font-size: 16px;
       box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    button {
+      padding: 10px 15px;
+      font-size: 16px;
+      margin-top: 10px;
+      cursor: pointer;
+      background-color: #0077cc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+
+    button:hover {
+      background-color: #005fa3;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      background-color: #fff;
+      margin: 5px 0;
+      padding: 10px;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .vak-blok {
+      background-color: #e9f0f7;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .vak-blok h4 {
+      margin-top: 0;
+    }
+
+    .vak-container {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .vak {
+      flex: 1;
+      min-width: 250px;
+    }
+
+    .player-actions button {
+      margin-left: 5px;
+      background-color: #ccc;
+      color: #333;
+    }
+
+    .player-actions button:hover {
+      background-color: #999;
     }
   </style>
 </head>
 <body>
-  <h1>Korfbal Setup</h1>
+  <div class="container">
+    <h1>Korfbal Setup</h1>
 
-  <div class="team-inputs">
-    <label for="teamThuis">Team Thuis:</label>
-    <input type="text" id="teamThuis" placeholder="Naam thuisteam" class="styled-input" />
+    <div class="input-group">
+      <label for="teamThuis">Team Thuis:</label>
+      <input type="text" id="teamThuis" placeholder="Naam thuisteam" />
+    </div>
 
-    <label for="teamUit">Team Uit:</label>
-    <input type="text" id="teamUit" placeholder="Naam uitteam" class="styled-input" />
+    <div class="input-group">
+      <label for="teamUit">Team Uit:</label>
+      <input type="text" id="teamUit" placeholder="Naam uitteam" />
+    </div>
+
+    <div class="input-group">
+      <label for="playerName">Naam speler:</label>
+      <input type="text" id="playerName" placeholder="Naam speler" />
+      <button id="addPlayerBtn">Toevoegen</button>
+    </div>
+
+    <h3>Gemaakte spelers</h3>
+    <ul id="playerList"></ul>
+
+    <h3>Toewijzen aan vakken</h3>
+    <div class="vak-container">
+      <div class="vak vak-blok">
+        <h4>1e aanvalsvak</h4>
+        <ul id="vakAanval"></ul>
+      </div>
+      <div class="vak vak-blok">
+        <h4>1e verdedigingsvak</h4>
+        <ul id="vakVerdediging"></ul>
+      </div>
+      <div class="vak vak-blok">
+        <h4>Wissels</h4>
+        <ul id="vakWissels"></ul>
+      </div>
+    </div>
+
+    <button id="startGameBtn" disabled>Ga naar wedstrijd</button>
   </div>
-
-  <h2>Spelers aanmaken</h2>
-  <input type="text" id="playerName" placeholder="Naam speler" />
-  <button id="addPlayerBtn">Toevoegen</button>
-
-  <h3>Gemaakte spelers</h3>
-  <ul id="playerList"></ul>
-
-  <h3>Toewijzen aan vakken</h3>
-  <h4>1e aanvalsvak</h4>
-  <ul id="vakAanval"></ul>
-
-  <h4>1e verdedigingsvak</h4>
-  <ul id="vakVerdediging"></ul>
-
-  <h4>Wissels</h4>
-  <ul id="vakWissels"></ul>
-
-  <button id="startGameBtn" disabled>Ga naar wedstrijd</button>
 
   <script src="script.js"></script>
 </body>
