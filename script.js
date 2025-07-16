@@ -1,88 +1,110 @@
-let stats = {
-    goals: 0,
-    shots: 0,
-    attacks: 0,
-    turnovers: 0,
-    shotsData: []
-};
+// Spelers per vak
+let vakA = [
+  { id: 1, naam: "Speler A1", shots: 0, goals: 0 },
+  { id: 2, naam: "Speler A2", shots: 0, goals: 0 },
+  { id: 3, naam: "Speler A3", shots: 0, goals: 0 },
+  { id: 4, naam: "Speler A4", shots: 0, goals: 0 }
+];
 
-function increment(type) {
-    stats[type]++;
-    document.getElementById(type).innerText = stats[type];
+let vakB = [
+  { id: 5, naam: "Speler B1", shots: 0, goals: 0 },
+  { id: 6, naam: "Speler B2", shots: 0, goals: 0 },
+  { id: 7, naam: "Speler B3", shots: 0, goals: 0 },
+  { id: 8, naam: "Speler B4", shots: 0, goals: 0 }
+];
+
+let bank = [];
+
+let actiefVak = "A"; // A of B
+let geselecteerdeSpeler = null;
+
+let aanvallenA = 0;
+let aanvallenB = 0;
+
+let doelpuntenSindsWissel = 0;
+
+// Knoppen
+const playersDiv = document.getElementById("players");
+const vakInfo = document.getElementById("vakInfo");
+const scoreInfo = document.getElementById("scoreInfo");
+const switchVakBtn = document.getElementById("switchVak");
+const goalBtn = document.getElementById("goalBtn");
+const shotBtn = document.getElementById("shotBtn");
+const subBtn = document.getElementById("subBtn");
+
+function toonSpelers() {
+  playersDiv.innerHTML = "";
+  const spelers = actiefVak === "A" ? vakA : vakB;
+  spelers.forEach(speler => {
+    const btn = document.createElement("button");
+    btn.textContent = speler.naam;
+    btn.onclick = () => selecteerSpeler(speler.id);
+    btn.className = geselecteerdeSpeler === speler.id ? "selected" : "";
+    playersDiv.appendChild(btn);
+  });
+  vakInfo.textContent = `Actief vak: ${actiefVak}`;
+  scoreInfo.textContent = `Aanvallen A: ${aanvallenA} | Aanvallen B: ${aanvallenB}`;
 }
 
-function calculatePercentages() {
-    let shotPercentage = stats.shots > 0 ? (stats.goals / stats.shots * 100).toFixed(1) : 0;
-    let turnoverPercentage = stats.attacks > 0 ? (stats.turnovers / stats.attacks * 100).toFixed(1) : 0;
-    document.getElementById('percentages').innerHTML =
-        `<p>Schotpercentage: ${shotPercentage}%</p>
-         <p>Balverliespercentage: ${turnoverPercentage}%</p>`;
+function selecteerSpeler(id) {
+  geselecteerdeSpeler = id;
+  toonSpelers();
 }
 
-function saveStats() {
-    localStorage.setItem('korfbalStats', JSON.stringify(stats));
-    alert('Statistieken opgeslagen.');
+function registreerSchot() {
+  if (!geselecteerdeSpeler) {
+    alert("Selecteer een speler.");
+    return;
+  }
+  const spelers = actiefVak === "A" ? vakA : vakB;
+  const speler = spelers.find(s => s.id === geselecteerdeSpeler);
+  speler.shots += 1;
+  alert(`${speler.naam}: Schot geregistreerd.`);
 }
 
-function loadStats() {
-    let data = localStorage.getItem('korfbalStats');
-    if (data) {
-        stats = JSON.parse(data);
-        document.getElementById('goals').innerText = stats.goals;
-        document.getElementById('shots').innerText = stats.shots;
-        document.getElementById('attacks').innerText = stats.attacks;
-        document.getElementById('turnovers').innerText = stats.turnovers;
-        renderShots();
-        alert('Statistieken geladen.');
-    }
+function registreerDoelpunt() {
+  if (!geselecteerdeSpeler) {
+    alert("Selecteer een speler.");
+    return;
+  }
+  const spelers = actiefVak === "A" ? vakA : vakB;
+  const speler = spelers.find(s => s.id === geselecteerdeSpeler);
+  speler.shots += 1;
+  speler.goals += 1;
+  doelpuntenSindsWissel += 1;
+  alert(`${speler.naam}: Doelpunt geregistreerd.`);
+  if (doelpuntenSindsWissel >= 2) {
+    wisselFuncties();
+  }
 }
 
-function resetStats() {
-    if (confirm('Weet je zeker dat je alles wilt resetten?')) {
-        stats = {
-            goals: 0,
-            shots: 0,
-            attacks: 0,
-            turnovers: 0,
-            shotsData: []
-        };
-        document.getElementById('goals').innerText = 0;
-        document.getElementById('shots').innerText = 0;
-        document.getElementById('attacks').innerText = 0;
-        document.getElementById('turnovers').innerText = 0;
-        document.getElementById('shotList').innerHTML = '';
-        document.getElementById('court').innerHTML = '';
-        document.getElementById('percentages').innerHTML = '';
-    }
+function wisselFuncties() {
+  alert("2 doelpunten gescoord. Functies wisselen.");
+  actiefVak = actiefVak === "A" ? "B" : "A";
+  doelpuntenSindsWissel = 0;
+  geselecteerdeSpeler = null;
+  toonSpelers();
 }
 
-function addShot(event) {
-    const rect = event.target.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / rect.width * 100).toFixed(1);
-    const y = ((event.clientY - rect.top) / rect.height * 100).toFixed(1);
-    stats.shotsData.push({x, y});
-    renderShots();
+function balNaarAnderVak() {
+  if (actiefVak === "A") {
+    aanvallenA += 1;
+    actiefVak = "B";
+  } else {
+    aanvallenB += 1;
+    actiefVak = "A";
+  }
+  geselecteerdeSpeler = null;
+  toonSpelers();
 }
 
-function renderShots() {
-    const court = document.getElementById('court');
-    const list = document.getElementById('shotList');
-    court.innerHTML = '';
-    list.innerHTML = '';
-    stats.shotsData.forEach((shot, index) => {
-        const marker = document.createElement('div');
-        marker.className = 'marker';
-        marker.style.left = `${shot.x}%`;
-        marker.style.top = `${shot.y}%`;
-        court.appendChild(marker);
-
-        const li = document.createElement('li');
-        li.textContent = `Schot ${index + 1}: X=${shot.x}%, Y=${shot.y}%`;
-        list.appendChild(li);
-    });
+function openWisselMenu() {
+  alert("Hier kun je wissels implementeren.");
 }
 
-document.getElementById('toggleMode').addEventListener('click', () => {
-    document.getElementById('basicStats').classList.toggle('hidden');
-    document.getElementById('advancedStats').classList.toggle('hidden');
-});
+switchVakBtn.onclick = balNaarAnderVak;
+goalBtn.onclick = registreerDoelpunt;
+shotBtn.onclick = registreerSchot;
+subBtn.onclick = openWisselMenu;
+
+toonSpelers();
