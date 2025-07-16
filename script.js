@@ -274,18 +274,76 @@ function registreerActie(type) {
   toonStand();
 }
 
-function wisselVak() {
-  actiefVak = actiefVak === "A" ? "B" : "A";
-  aanvallen[actiefVak]++;
-  toonActiefVak();
+// === Toevoegen van visuele bevestiging bij wissel ===
+function toonBevestiging(tekst) {
+  const bevestiging = document.createElement("div");
+  bevestiging.textContent = tekst;
+  bevestiging.style.position = "fixed";
+  bevestiging.style.top = "20px";
+  bevestiging.style.right = "20px";
+  bevestiging.style.backgroundColor = "#4CAF50";
+  bevestiging.style.color = "white";
+  bevestiging.style.padding = "10px 20px";
+  bevestiging.style.borderRadius = "5px";
+  bevestiging.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
+  bevestiging.style.zIndex = "1000";
+  document.body.appendChild(bevestiging);
+  setTimeout(() => bevestiging.remove(), 3000);
 }
 
-function wisselFunctie() {
+// === Wisselfunctie met visuele bevestiging ===
+function wisselSpeler(uitId, inId) {
   spelers = spelers.map(speler => {
-    if (speler.vak === "aanval") return { ...speler, vak: "verdediging" };
-    if (speler.vak === "verdediging") return { ...speler, vak: "aanval" };
+    if (speler.id === uitId) return { ...speler, vak: "wissel" };
+    if (speler.id === inId) return { ...speler, vak: actiefVak === "A" ? "aanval" : "verdediging" };
     return speler;
   });
+  localStorage.setItem("spelers", JSON.stringify(spelers));
+  toonActiefVak();
+  toonBevestiging("Wissel uitgevoerd: speler gewisseld.");
+}
+
+// === Wisselkeuze tonen ===
+function toonWisselKeuze(uitId) {
+  const wissels = spelers.filter(s => s.vak === "wissel");
+  if (wissels.length === 0) {
+    toonBevestiging("Geen wisselspelers beschikbaar.");
+    return;
+  }
+  const keuze = prompt("Wissel met speler:", wissels.map(s => s.naam).join(", "));
+  const inSpeler = wissels.find(s => s.naam === keuze);
+  if (inSpeler) {
+    wisselSpeler(uitId, inSpeler.id);
+  } else {
+    toonBevestiging("Wissel geannuleerd of speler niet gevonden.");
+  }
+}
+
+// === Voeg wisselknoppen toe aan actieve spelers ===
+function toonActiefVak() {
+  const container = document.getElementById("spelersVak");
+  container.innerHTML = "";
+  const vak = actiefVak === "A" ? "aanval" : "verdediging";
+  const spelersInVak = spelers.filter(s => s.vak === vak);
+  spelersInVak.forEach(speler => {
+    const wrapper = document.createElement("div");
+    wrapper.style.marginBottom = "10px";
+
+    const btn = document.createElement("button");
+    btn.textContent = speler.naam;
+    btn.onclick = () => selecteerSpeler(speler.id, btn);
+    if (speler.id === geselecteerdeSpeler) btn.classList.add("geselecteerd");
+
+    const wisselBtn = document.createElement("button");
+    wisselBtn.textContent = "Wissel";
+    wisselBtn.style.marginLeft = "10px";
+    wisselBtn.onclick = () => toonWisselKeuze(speler.id);
+
+    wrapper.appendChild(btn);
+    wrapper.appendChild(wisselBtn);
+    container.appendChild(wrapper);
+  });
+  document.getElementById("actiefVakLabel").textContent = `Actief vak: ${actiefVak}`;
 }
 
 // === STATISTIEKEN SCHERM ===
