@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="nl">
 <head>
@@ -7,102 +6,93 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #eef2f5;
       text-align: center;
-      padding: 20px;
+      background-color: #f9f9f9;
     }
-
     h1 {
-      color: #333;
+      margin-top: 20px;
     }
-
-    .veld-container {
-      position: relative;
-      width: 600px;
+    .veld {
+      width: 400px;
       height: 400px;
       margin: 20px auto;
-      background-color: #cce5cc;
-      border: 2px solid #333;
-      border-radius: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 2px;
+      background-color: #ccc;
     }
-
     .zone {
-      position: absolute;
-      border: 1px dashed #444;
+      background-color: #e0e0e0;
+      border: 1px solid #999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       cursor: pointer;
-      opacity: 0.3;
+      font-weight: bold;
     }
-
     .zone:hover {
-      opacity: 0.6;
-      background-color: #ffcc00;
+      background-color: #b0d4f1;
     }
-
-    #log {
-      margin-top: 20px;
-      text-align: left;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      background: #fff;
-      padding: 10px;
-      border-radius: 5px;
-      height: 150px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-    }
-
     .controls {
       margin-top: 20px;
     }
-
-    .controls button {
-      margin: 5px;
-      padding: 10px 15px;
-      font-size: 14px;
+    .log {
+      margin-top: 20px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
     }
   </style>
 </head>
 <body>
-  <h1>Wedstrijdregistratie - Uitgebreid</h1>
+  <h1>Wedstrijd Uitgebreid</h1>
+  <div class="veld">
+    <div class="zone" data-zone="linksboven">↖</div>
+    <div class="zone" data-zone="middenboven">↑</div>
+    <div class="zone" data-zone="rechtsboven">↗</div>
+    <div class="zone" data-zone="middenlinks">←</div>
+    <div class="zone" data-zone="midden">●</div>
+    <div class="zone" data-zone="middenrechts">→</div>
+    <div class="zone" data-zone="linksonder">↙</div>
+    <div class="zone" data-zone="middenonder">↓</div>
+    <div class="zone" data-zone="rechtsonder">↘</div>
+  </div>
 
   <div class="controls">
-    <label>Actie:</label>
-    <select id="actieSelect">
-      <option value="schot">Schotpoging</option>
-      <option value="doelpunt">Doelpunt</option>
-      <option value="balverlies">Balverlies</option>
-    </select>
+    <button onclick="registreerActie('schot')">Schotpoging</button>
+    <button onclick="registreerActie('doelpunt')">Doelpunt</button>
+    <button onclick="registreerActie('balverlies')">Balverlies</button>
   </div>
 
-  <div class="veld-container" id="veld">
-    <!-- Zones op het veld -->
-    <div class="zone" data-zone="linksboven" style="top: 20px; left: 20px; width: 150px; height: 150px;"></div>
-    <div class="zone" data-zone="rechtsboven" style="top: 20px; right: 20px; width: 150px; height: 150px;"></div>
-    <div class="zone" data-zone="linksonder" style="bottom: 20px; left: 20px; width: 150px; height: 150px;"></div>
-    <div class="zone" data-zone="rechtsonder" style="bottom: 20px; right: 20px; width: 150px; height: 150px;"></div>
-    <div class="zone" data-zone="midden" style="top: 125px; left: 225px; width: 150px; height: 150px;"></div>
+  <div class="log">
+    <h3>Actielog</h3>
+    <ul id="actieLog"></ul>
   </div>
-
-  <div id="log"><strong>Actielog:</strong><br /></div>
 
   <script>
+    let geselecteerdeZone = null;
     const zones = document.querySelectorAll('.zone');
-    const log = document.getElementById('log');
-    const actieSelect = document.getElementById('actieSelect');
-
     zones.forEach(zone => {
       zone.addEventListener('click', () => {
-        const actie = actieSelect.value;
-        const locatie = zone.getAttribute('data-zone');
-        const tijd = new Date().toLocaleTimeString();
-        const bericht = tijd + " - " + actie + " vanuit " + locatie;
-        const p = document.createElement('div');
-        p.textContent = bericht;
-        log.appendChild(p);
-        log.scrollTop = log.scrollHeight;
+        zones.forEach(z => z.style.backgroundColor = '#e0e0e0');
+        zone.style.backgroundColor = '#a0c4ff';
+        geselecteerdeZone = zone.dataset.zone;
       });
     });
+
+    function registreerActie(type) {
+      if (!geselecteerdeZone) {
+        alert("Selecteer eerst een zone op het veld.");
+        return;
+      }
+      const log = document.getElementById("actieLog");
+      const li = document.createElement("li");
+      const tijd = new Date().toLocaleTimeString();
+      li.textContent = `${tijd} - ${type} vanuit ${geselecteerdeZone}`;
+      log.appendChild(li);
+    }
   </script>
 </body>
 </html>
