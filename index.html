@@ -3,26 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Korfbal Statistieken</title>
+  <title>Korfbal Setup</title>
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <header>
-    <button id="switchVak">Bal naar andere vak</button>
-  </header>
-  <main>
-    <section id="players"></section>
-    <section id="field">
-      <div id="vakInfo"></div>
-      <div id="scoreInfo"></div>
-    </section>
-    <section id="actions">
-      <button id="goalBtn">Doelpunt</button>
-      <button id="shotBtn">Schot</button>
-      <button id="subBtn">Wissels</button>
-    </section>
+  <main id="setupScreen">
+    <h1>Spelers aanmaken</h1>
+    <input type="text" id="playerName" placeholder="Naam speler"/>
+    <button id="addPlayerBtn">Toevoegen</button>
+    <h2>Gemaakte spelers</h2>
+    <ul id="playerList"></ul>
+    <h2>Toewijzen aan vakken</h2>
+    <div id="assignmentArea">
+      <div>
+        <h3>1e aanvalsvak</h3>
+        <ul id="vakAanval"></ul>
+      </div>
+      <div>
+        <h3>1e verdedigingsvak</h3>
+        <ul id="vakVerdediging"></ul>
+      </div>
+      <div>
+        <h3>Wissels</h3>
+        <ul id="vakWissels"></ul>
+      </div>
+    </div>
+    <button id="startGameBtn" disabled>Ga naar wedstrijd</button>
   </main>
-
   <script src="script.js"></script>
 </body>
 </html>
