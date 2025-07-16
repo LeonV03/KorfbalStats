@@ -35,69 +35,58 @@ ul {
   padding: 0;
 }
 
+//Wedstrijd-html
 body {
   font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 1rem;
-  background: #f4f4f4;
+  padding: 20px;
+  background: #f8f8f8;
 }
 
-main {
-  max-width: 900px;
-  margin: auto;
+h1 {
+  text-align: center;
 }
 
-.wedstrijdContainer {
-  display: flex;
-  gap: 2rem;
-  margin-top: 1rem;
-}
-
-.spelerKolom {
-  flex: 1;
-}
-
-.vakContainer {
+.spelers-container {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 10px;
+  margin: 20px 0;
 }
 
-.vakContainer button {
+.spelers-container button {
   font-size: 1.2rem;
-  padding: 1rem;
-  text-align: left;
+  padding: 15px;
+  cursor: pointer;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  transition: background-color 0.2s ease;
 }
 
-.vakContainer button.geselecteerd {
-  background-color: #ccc;
+.spelers-container button.geselecteerd {
+  background-color: #dddddd;
 }
 
-.veldKolom {
+.actie-knoppen {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
 }
 
-.veldAfbeelding {
-  max-width: 300px;
-  margin-bottom: 1rem;
-  border: 1px solid #000;
+.actie-knoppen button {
+  font-size: 1rem;
+  padding: 10px 20px;
+  cursor: pointer;
 }
 
-.actieKnoppen button {
-  font-size: 1.2rem;
-  padding: 1rem 2rem;
-  margin: 0.5rem;
+.actie-doelpunt {
+  background-color: #4caf50;
+  color: white;
+  border: none;
 }
 
-#standContainer {
-  margin-top: 1rem;
-  font-size: 1.2rem;
-}
-
-.switchVakBtn {
-  width: 100%;
-  font-size: 1.2rem;
-  padding: 1rem;
+.actie-schot {
+  background-color: #f44336;
+  color: white;
+  border: none;
 }
