@@ -35,18 +35,69 @@ ul {
   padding: 0;
 }
 
-.vakContainer {
-  display: flex;
-  gap: 0.5rem;
-  margin: 1rem 0;
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 1rem;
+  background: #f4f4f4;
 }
 
-.actieKnoppen {
-  margin: 1rem 0;
+main {
+  max-width: 900px;
+  margin: auto;
+}
+
+.wedstrijdContainer {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.spelerKolom {
+  flex: 1;
+}
+
+.vakContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.vakContainer button {
+  font-size: 1.2rem;
+  padding: 1rem;
+  text-align: left;
+}
+
+.vakContainer button.geselecteerd {
+  background-color: #ccc;
+}
+
+.veldKolom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.veldAfbeelding {
+  max-width: 300px;
+  margin-bottom: 1rem;
+  border: 1px solid #000;
 }
 
 .actieKnoppen button {
-  padding: 1rem;
-  font-size: 1rem;
+  font-size: 1.2rem;
+  padding: 1rem 2rem;
+  margin: 0.5rem;
 }
 
+#standContainer {
+  margin-top: 1rem;
+  font-size: 1.2rem;
+}
+
+.switchVakBtn {
+  width: 100%;
+  font-size: 1.2rem;
+  padding: 1rem;
+}
