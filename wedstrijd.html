@@ -1,217 +1,178 @@
-
 <!DOCTYPE html>
+
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <title>Wedstrijdregistratie</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
-        }
-        .scoreboard {
-            display: flex;
-            justify-content: space-between;
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .vak-indicator {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-        .vak {
-            flex: 1;
-            text-align: center;
-            padding: 15px;
-            border: 2px solid #ccc;
-            margin: 0 10px;
-            border-radius: 8px;
-            background-color: white;
-        }
-        .vak.active {
-            background-color: #d3d3d3;
-            border-color: #888;
-        }
-        #spelersContainer {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            margin-top: 30px;
-        }
-        .speler-blok {
-            flex: 1 1 200px;
-            min-width: 180px;
-            background-color: #f0f0f0;
-            padding: 20px;
-            text-align: center;
-            border-radius: 10px;
-        }
-        .actie-knoppen {
-            margin-top: 10px;
-        }
-        .actie-knoppen button {
-            margin: 5px;
-            padding: 10px 15px;
-            border: none;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .goal {
-            background-color: lightgreen;
-        }
-        .shot {
-            background-color: lightcoral;
-        }
-        #wisselBtn {
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 16px;
-        }
-        #statistiekenLink {
-            display: block;
-            margin-top: 40px;
-            text-align: center;
-            font-size: 18px;
-        }
-    </style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Wedstrijdregistratie</title>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 1rem;
+      background-color: #f4f4f4;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    #scorebord {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #fff;
+      padding: 1rem;
+     px;
+      margin-bottom: 1rem;
+      font-size: 1.2rem;
+    }
+    #scorebord .team {
+      flex: 1;
+      text-align: center;
+    }
+    #scorebord .score {
+      flex: 1;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    #vakkenContainer {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    .vak {
+      flex: 1;
+      background-color: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .vak h3 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .speler {
+      display: block;
+      margin: 0.5rem 0;
+      padding: 0.5rem;
+      background-color: #e0e0e0;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .actief {
+      background-color: #d3d3d3 !important;
+    }
+  </style>
 </head>
-<body>
+<body onload="initWedstrijd()"><button id="menuButton">Open Menu</button><div id="menu" style="display:none;">
+<h3>Wisselmenu</h3>
+<div>
+<label>Wissels:</label>
+<select id="wisselsSelect"></select>
+</div>
+<div>
+<label>1e Aanvalsvak:</label>
+<select id="aanvalSelect"></select>
+</div>
+<div>
+<label>1e Verdedigingsvak:</label>
+<select id="verdedigingSelect"></select>
+</div>
+<button onclick="wisselSpelers()">Wissel</button>
+</div>
+<header>
+<button id="wisselBtn">Wissels</button>
+<a href="statistieken.html" id="statsBtn">Statistieken →</a>
+</header>
+<div id="scorebord">
+<div class="team" id="teamThuisLabel">Team Thuis</div>
+<div class="score" id="scoreDisplay"><span id="scoreThuis">0</span> - <span id="scoreUit">0</span></div>
+<div class="team" id="teamUitLabel">Team Uit</div>
+</div>
+<div id="vakkenContainer">
+<div class="vak" id="eersteAanvalsvak">
+<h3>1e Aanvalsvak</h3>
+<ul id="aanvalSpelers"></ul>
+</div>
+<div class="vak" id="eersteVerdedigingsvak">
+<h3>1e Verdedigingsvak</h3>
+<ul id="verdedigingSpelers"></ul>
+</div>
+<div class="vak" id="wisselVak">
+<h3>Wissels</h3>
+<ul id="wisselSpelers"></ul>
+</div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const spelers = JSON.parse(localStorage.getItem("spelers")) || [];
+      const actiefVak = localStorage.getItem("actiefVak") || "A";
 
-    <h1>Wedstrijdregistratie</h1>
+      const aanvalList = document.getElementById("aanvalSpelers");
+      const verdedigingList = document.getElementById("verdedigingSpelers");
+      const wisselList = document.getElementById("wisselSpelers");
 
-    <div class="scoreboard">
-        <span id="teamThuis">Team Thuis</span>
-        <span id="score">0 - 0</span>
-        <span id="teamUit">Team Uit</span>
-    </div>
+      spelers.forEach(speler => {
+        const li = document.createElement("li");
+        li.className = "speler";
+        li.textContent = speler.naam;
+        if (speler.vak === "aanval") aanvalList.appendChild(li);
+        else if (speler.vak === "verdediging") verdedigingList.appendChild(li);
+        else if (speler.vak === "wissel") wisselList.appendChild(li);
+      });
 
-    <div class="vak-indicator">
-        <div id="vakA" class="vak active">Vak A - Aanval</div>
-        <div id="vakB" class="vak">Vak B - Verdediging</div>
-    </div>
+      if (actiefVak === "A") {
+        document.getElementById("eersteAanvalsvak").classList.add("actief");
+      } else {
+        document.getElementById("eersteVerdedigingsvak").classList.add("actief");
+      }
+    });
+  </script>
+<script src="script.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const aanvalVak = document.getElementById("aanvalVak");
+    const verdedigingVak = document.getElementById("verdedigingVak");
+    const wisselsSelect = document.getElementById("wisselsSelect");
+    const aanvalSelect = document.getElementById("aanvalSelect");
+    const verdedigingSelect = document.getElementById("verdedigingSelect");
 
-    <button id="wisselBtn" onclick="wisselVak()">Bal naar ander vak</button>
+    const spelers = JSON.parse(localStorage.getItem("spelers") || "[]");
 
-    <div id="spelersContainer">
-        <!-- Spelers worden hier dynamisch geladen -->
-    </div>
-
-    <a id="statistiekenLink" href="statistieken.html">Bekijk Statistieken →</a>
-
-    <script>
-        let teamThuis = localStorage.getItem('teamThuis') || 'Team Thuis';
-        let teamUit = localStorage.getItem('teamUit') || 'Team Uit';
-        let spelers = JSON.parse(localStorage.getItem('spelers')) || [];
-        let statistieken = JSON.parse(localStorage.getItem('statistieken')) || {};
-        let scoreThuis = 0;
-        let scoreUit = 0;
-        let huidigVak = 'A';
-        let functieA = 'aanval';
-        let functieB = 'verdediging';
-        let doelpuntenInVak = 0;
-
-        function updateScoreboard() {
-            document.getElementById('teamThuis').innerText = teamThuis;
-            document.getElementById('teamUit').innerText = teamUit;
-            document.getElementById('score').innerText = `${scoreThuis} - ${scoreUit}`;
+    spelers.forEach(speler => {
+        const option = new Option(speler.naam, speler.naam);
+        if (speler.vak === "aanval") {
+            aanvalVak.appendChild(document.createElement("li")).textContent = speler.naam;
+            aanvalSelect.appendChild(option.cloneNode(true));
+        } else if (speler.vak === "verdediging") {
+            verdedigingVak.appendChild(document.createElement("li")).textContent = speler.naam;
+            verdedigingSelect.appendChild(option.cloneNode(true));
+        } else {
+            wisselsSelect.appendChild(option.cloneNode(true));
         }
+    });
 
-        function updateVakIndicator() {
-            const vakA = document.getElementById('vakA');
-            const vakB = document.getElementById('vakB');
-            const functie = huidigVak === 'A' ? functieA : functieB;
-            vakA.classList.remove('active');
-            vakB.classList.remove('active');
-            if (huidigVak === 'A') {
-                vakA.classList.add('active');
-                vakA.innerText = `Vak A - ${functie.charAt(0).toUpperCase() + functie.slice(1)}`;
-                vakB.innerText = `Vak B - ${functieB.charAt(0).toUpperCase() + functieB.slice(1)}`;
-            } else {
-                vakB.classList.add('active');
-                vakB.innerText = `Vak B - ${functie.charAt(0).toUpperCase() + functie.slice(1)}`;
-                vakA.innerText = `Vak A - ${functieA.charAt(0).toUpperCase() + functieA.slice(1)}`;
-            }
-        }
+    document.getElementById("menuButton").addEventListener("click", function() {
+        const menu = document.getElementById("menu");
+        menu.style.display = menu.style.display === "none" ? "block" : "none";
+    });
+});
 
-        function laadSpelers() {
-            const container = document.getElementById('spelersContainer');
-            container.innerHTML = '';
-            const vakSpelers = spelers.filter(s => s.vak === huidigVak);
-            vakSpelers.forEach(speler => {
-                const blok = document.createElement('div');
-                blok.className = 'speler-blok';
-                blok.innerHTML = `<strong>${speler.naam}</strong>
-                    <div class="actie-knoppen">
-                        <button class="goal" onclick="event.stopPropagation(); registreerActie('${speler.naam}', 'doelpunt')">Doelpunt</button>
-                        <button class="shot" onclick="event.stopPropagation(); registreerActie('${speler.naam}', 'doelpoging')">Doelpoging</button>
-                    </div>`;
-                container.appendChild(blok);
-            });
-        }
+function wisselSpelers() {
+    const wissel = document.getElementById("wisselsSelect").value;
+    const aanval = document.getElementById("aanvalSelect").value;
+    const verdediging = document.getElementById("verdedigingSelect").value;
 
-        function registreerActie(speler, type) {
-            if (!statistieken[speler]) {
-                statistieken[speler] = {
-                    doelpunten_voor: 0,
-                    doelpogingen_voor: 0,
-                    doelpunten_tegen: 0,
-                    doelpogingen_tegen: 0
-                };
-            }
-
-            const functie = huidigVak === 'A' ? functieA : functieB;
-            const isAanval = functie === 'aanval';
-
-            if (type === 'doelpunt') {
-                if (isAanval) {
-                    statistieken[speler].doelpunten_voor++;
-                    statistieken[speler].doelpogingen_voor++;
-                    if (functieA === 'aanval') scoreThuis++; else scoreUit++;
-                } else {
-                    statistieken[speler].doelpunten_tegen++;
-                    statistieken[speler].doelpogingen_tegen++;
-                    if (functieA === 'verdediging') scoreThuis++; else scoreUit++;
-                }
-                doelpuntenInVak++;
-                wisselVakNaDoelpunt();
-            } else if (type === 'doelpoging') {
-                if (isAanval) {
-                    statistieken[speler].doelpogingen_voor++;
-                } else {
-                    statistieken[speler].doelpogingen_tegen++;
-                }
-            }
-
-            localStorage.setItem('statistieken', JSON.stringify(statistieken));
-            updateScoreboard();
-        }
-
-        function wisselVakNaDoelpunt() {
-            wisselVak();
-            if (doelpuntenInVak >= 2) {
-                doelpuntenInVak = 0;
-                const temp = functieA;
-                functieA = functieB;
-                functieB = temp;
-            }
-            updateVakIndicator();
-            laadSpelers();
-        }
-
-        function wisselVak() {
-            huidigVak = huidigVak === 'A' ? 'B' : 'A';
-            updateVakIndicator();
-            laadSpelers();
-        }
-
-        window.onload = function() {
-            updateScoreboard();
-            updateVakIndicator();
-            laadSpelers();
-        };
-    </script>
-
-</body>
+    if (wissel && aanval) {
+        alert(`Wissel ${wissel} met ${aanval}`);
+    } else if (wissel && verdediging) {
+        alert(`Wissel ${wissel} met ${verdediging}`);
+    } else {
+        alert("Selecteer een wissel en een speler uit een vak.");
+    }
+}
+</script></body>
 </html>
