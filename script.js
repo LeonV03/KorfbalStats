@@ -274,76 +274,148 @@ function registreerActie(type) {
   toonStand();
 }
 
-// === Toevoegen van visuele bevestiging bij wissel ===
-function toonBevestiging(tekst) {
-  const bevestiging = document.createElement("div");
-  bevestiging.textContent = tekst;
-  bevestiging.style.position = "fixed";
-  bevestiging.style.top = "20px";
-  bevestiging.style.right = "20px";
-  bevestiging.style.backgroundColor = "#4CAF50";
-  bevestiging.style.color = "white";
-  bevestiging.style.padding = "10px 20px";
-  bevestiging.style.borderRadius = "5px";
-  bevestiging.style.boxShadow = "0 2px 6px rgba(0,0,0,0.3)";
-  bevestiging.style.zIndex = "1000";
-  document.body.appendChild(bevestiging);
-  setTimeout(() => bevestiging.remove(), 3000);
-}
+let spelers = JSON.parse(localStorage.getItem("spelers")) || [];
+let actiefVak = "A";
+let doelpunten = { A: 0, B: 0 };
+let doelpuntenTeller = 0;
+let geselecteerdeSpeler = null;
 
-// === Wisselfunctie met visuele bevestiging ===
-function wisselSpeler(uitId, inId) {
-  spelers = spelers.map(speler => {
-    if (speler.id === uitId) return { ...speler, vak: "wissel" };
-    if (speler.id === inId) return { ...speler, vak: actiefVak === "A" ? "aanval" : "verdediging" };
-    return speler;
-  });
-  localStorage.setItem("spelers", JSON.stringify(spelers));
+document.addEventListener("DOMContentLoaded", () => {
+  initWedstrijd();
+});
+
+function initWedstrijd() {
   toonActiefVak();
-  toonBevestiging("Wissel uitgevoerd: speler gewisseld.");
+  toonStand();
+  document.getElementById("switchVakBtn").onclick = wisselVak;
+  document.getElementById("goalBtn").onclick = () => registreerActie("doelpunt");
+  document.getElementById("shotBtn").onclick = () => registreerActie("schot");
+  document.getElementById("statsBtn").onclick = () => {
+    window.location.href = "statistieken.html";
+  };
+  document.getElementById("wisselBtn").onclick = toonWisselMenu;
 }
 
-// === Wisselkeuze tonen ===
-function toonWisselKeuze(uitId) {
-  const wissels = spelers.filter(s => s.vak === "wissel");
-  if (wissels.length === 0) {
-    toonBevestiging("Geen wisselspelers beschikbaar.");
-    return;
-  }
-  const keuze = prompt("Wissel met speler:", wissels.map(s => s.naam).join(", "));
-  const inSpeler = wissels.find(s => s.naam === keuze);
-  if (inSpeler) {
-    wisselSpeler(uitId, inSpeler.id);
-  } else {
-    toonBevestiging("Wissel geannuleerd of speler niet gevonden.");
-  }
-}
-
-// === Voeg wisselknoppen toe aan actieve spelers ===
 function toonActiefVak() {
   const container = document.getElementById("spelersVak");
   container.innerHTML = "";
   const vak = actiefVak === "A" ? "aanval" : "verdediging";
   const spelersInVak = spelers.filter(s => s.vak === vak);
   spelersInVak.forEach(speler => {
-    const wrapper = document.createElement("div");
-    wrapper.style.marginBottom = "10px";
-
     const btn = document.createElement("button");
     btn.textContent = speler.naam;
     btn.onclick = () => selecteerSpeler(speler.id, btn);
     if (speler.id === geselecteerdeSpeler) btn.classList.add("geselecteerd");
-
-    const wisselBtn = document.createElement("button");
-    wisselBtn.textContent = "Wissel";
-    wisselBtn.style.marginLeft = "10px";
-    wisselBtn.onclick = () => toonWisselKeuze(speler.id);
-
-    wrapper.appendChild(btn);
-    wrapper.appendChild(wisselBtn);
-    container.appendChild(wrapper);
+    container.appendChild(btn);
   });
   document.getElementById("actiefVakLabel").textContent = `Actief vak: ${actiefVak}`;
+}
+
+function selecteerSpeler(id, btn) {
+  geselecteerdeSpeler = id;
+  document.querySelectorAll("#spelersVak button").forEach(b => b.classList.remove("geselecteerd"));
+  btn.classList.add("geselecteerd");
+}
+
+function registreerActie(type) {
+  if (!geselecteerdeSpeler) {
+    alert("Selecteer eerst een speler.");
+    return;
+  }
+  spelers = spelers.map(speler => {
+    if (speler.id === geselecteerdeSpeler) {
+      if (!speler.stats) speler.stats = { schot: 0, doelpunt: 0 };
+      if (type === "doelpunt") {
+        speler.stats.doelpunt++;
+        doelpunten[actiefVak]++;
+        doelpuntenTeller++;
+      } else {
+        speler.stats.schot++;
+      }
+    }
+    return speler;
+  });
+  localStorage.setItem("spelers", JSON.stringify(spelers));
+  if (type === "doelpunt" && doelpuntenTeller % 2 === 0) {
+    wisselFunctie();
+  }
+  geselecteerdeSpeler = null;
+  toonActiefVak();
+  toonStand();
+}
+
+function toonStand() {
+  document.getElementById("scoreThuis").textContent = doelpunten.A;
+  document.getElementById("scoreUit").textContent = doelpunten.B;
+}
+
+function wisselVak() {
+  actiefVak = actiefVak === "A" ? "B" : "A";
+  toonActiefVak();
+}
+
+function wisselFunctie() {
+  spelers = spelers.map(speler => {
+    if (speler.vak === "aanval") return { ...speler, vak: "verdediging" };
+    if (speler.vak === "verdediging") return { ...speler, vak: "aanval" };
+    return speler;
+  });
+  localStorage.setItem("spelers", JSON.stringify(spelers));
+}
+
+function toonWisselMenu() {
+  const wisselContainer = document.getElementById("wisselMenu");
+  wisselContainer.innerHTML = "";
+
+  const wissels = spelers.filter(s => s.vak === "wissel");
+  const veldspelers = spelers.filter(s => s.vak === "aanval" || s.vak === "verdediging");
+
+  const wisselSelect = document.createElement("select");
+  wisselSelect.id = "wisselSelect";
+  wissels.forEach(speler => {
+    const opt = document.createElement("option");
+    opt.value = speler.id;
+    opt.textContent = speler.naam;
+    wisselSelect.appendChild(opt);
+  });
+
+  const veldSelect = document.createElement("select");
+  veldSelect.id = "veldSelect";
+  veldspelers.forEach(speler => {
+    const opt = document.createElement("option");
+    opt.value = speler.id;
+    opt.textContent = speler.naam + " (" + speler.vak + ")";
+    veldSelect.appendChild(opt);
+  });
+
+  const wisselKnop = document.createElement("button");
+  wisselKnop.textContent = "Voer wissel uit";
+  wisselKnop.onclick = () => {
+    const inId = parseInt(wisselSelect.value);
+    const uitId = parseInt(veldSelect.value);
+    voerWisselUit(inId, uitId);
+  };
+
+  wisselContainer.appendChild(document.createTextNode("Wisselspeler: "));
+  wisselContainer.appendChild(wisselSelect);
+  wisselContainer.appendChild(document.createElement("br"));
+  wisselContainer.appendChild(document.createTextNode("Veldspeler: "));
+  wisselContainer.appendChild(veldSelect);
+  wisselContainer.appendChild(document.createElement("br"));
+  wisselContainer.appendChild(wisselKnop);
+}
+
+function voerWisselUit(inId, uitId) {
+  const uitSpeler = spelers.find(s => s.id === uitId);
+  const vak = uitSpeler.vak;
+  spelers = spelers.map(speler => {
+    if (speler.id === uitId) return { ...speler, vak: "wissel" };
+    if (speler.id === inId) return { ...speler, vak };
+    return speler;
+  });
+  localStorage.setItem("spelers", JSON.stringify(spelers));
+  toonActiefVak();
+  toonWisselMenu();
 }
 
 // === STATISTIEKEN SCHERM ===
