@@ -2,6 +2,24 @@
 
 <html lang="nl">
 <head>
+// Alleen gebruiken voor test
+<script>
+  const testSpelers = [
+    { naam: "Speler A1", vak: "aanval" },
+    { naam: "Speler A2", vak: "aanval" },
+    { naam: "Speler A3", vak: "aanval" },
+    { naam: "Speler A4", vak: "aanval" },
+    { naam: "Speler V1", vak: "verdediging" },
+    { naam: "Speler V2", vak: "verdediging" },
+    { naam: "Speler V3", vak: "verdediging" },
+    { naam: "Speler V4", vak: "verdediging" },
+    { naam: "Speler W1", vak: "wissel" },
+    { naam: "Speler W2", vak: "wissel" }
+  ];
+  localStorage.setItem("spelers", JSON.stringify(testSpelers));
+  localStorage.setItem("actiefVak", "A");
+</script>
+
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Wedstrijdregistratie</title>
@@ -65,6 +83,19 @@
     .actief {
       background-color: #d3d3d3 !important;
     }
+.speler-blok {
+  background-color: #e0e0e0;
+  padding: 1rem;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.speler-blok.geselecteerd {
+  background-color: #b0c4de !important;
+}
   </style>
 </head>
 <body onload="initWedstrijd()">
@@ -78,73 +109,182 @@
 <div class="team" id="teamUitLabel">Team Uit</div>
 </div>
 <div id="vakkenContainer">
-<div class="vak" id="eersteAanvalsvak">
-<h3>1e Aanvalsvak</h3>
-<ul id="aanvalSpelers"></ul>
+  <div class="vak" id="eersteAanvalsvak">
+    <h3>1e Aanvalsvak</h3>
+    <ul id="aanvalSpelers"></ul>
+  </div>
+  <div class="vak" id="eersteVerdedigingsvak">
+    <h3>1e Verdedigingsvak</h3>
+    <ul id="verdedigingSpelers"></ul>
+  </div>
 </div>
-<div class="vak" id="eersteVerdedigingsvak">
-<h3>1e Verdedigingsvak</h3>
-<ul id="verdedigingSpelers"></ul>
+<!-- Spelersvakken onder de vakkenContainer -->
+<div id="Spelersvakken" style="margin-top: 1rem;">
+  <div class="vak" id="actieveSpelersGrid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+    <!-- Spelers worden hier dynamisch toegevoegd -->
+  </div>
 </div>
-</div><div id="actieveSpelersContainer" style="margin: 1rem 0; padding: 1rem; background-color: #ffffff; border-radius: 8px;"><h3>Spelers in actief vak</h3><ul id="actieveSpelers"></ul></div>
+<!-- Actieknoppen onder spelersvakken -->
+<div id="actieKnoppen" style="display: flex; justify-content: space-between; gap: 1rem; margin-top: 1rem;">
+  <button id="doelpuntBtn" style="flex: 1; padding: 1rem; background-color: green; color: white; border: none; border-radius: 6px; font-size: 1rem;">Doelpunt</button>
+  <button id="doelpogingBtn" style="flex: 1; padding: 1rem; background-color: red; color: white; border: none; border-radius: 6px; font-size: 1rem;">Doelpoging</button>
+</div>
 <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const spelers = JSON.parse(localStorage.getItem("spelers")) || [];
-      const actiefVak = localStorage.getItem("actiefVak") || "A";
+  let geselecteerdeSpeler = null;
 
-      const aanvalList = document.getElementById("aanvalSpelers");
-      const verdedigingList = document.getElementById("verdedigingSpelers");
-      const wisselList = document.getElementById("wisselSpelers");
-
-      spelers.forEach(speler => {
-        const li = document.createElement("li");
-        li.className = "speler";
-        li.textContent = speler.naam;
-        if (speler.vak === "aanval") aanvalList.appendChild(li);
-        else if (speler.vak === "verdediging") verdedigingList.appendChild(li);
-        else if (speler.vak === "wissel") wisselList.appendChild(li);
-      });
-
-      if (actiefVak === "A") {
-        document.getElementById("eersteAanvalsvak").classList.add("actief");
-      } else {
-        document.getElementById("eersteVerdedigingsvak").classList.add("actief");
-      }
-    });
-  </script>
-<script src="script.js"></script>
-<script>
-function updateActieveSpelers() {
+  function updateActieveSpelers() {
     const spelers = JSON.parse(localStorage.getItem("spelers")) || [];
     const actiefVak = localStorage.getItem("actiefVak") || "A";
-    const actieveSpelersList = document.getElementById("actieveSpelers");
-    actieveSpelersList.innerHTML = "";
+    const grid = document.getElementById("actieveSpelersGrid");
+    grid.innerHTML = "";
 
     const vakNaam = actiefVak === "A" ? "aanval" : "verdediging";
-    spelers.filter(speler => speler.vak === vakNaam).forEach(speler => {
-        const li = document.createElement("li");
-        li.textContent = speler.naam;
-        actieveSpelersList.appendChild(li);
-    });
-}
+    spelers
+      .filter(speler => speler.vak === vakNaam)
+      .forEach(speler => {
+        const div = document.createElement("div");
+        div.className = "speler-blok";
+        div.style = `
+          background-color: #e0e0e0;
+          padding: 1rem;
+          border-radius: 6px;
+          text-align: center;
+          font-weight: bold;
+          cursor: pointer;
+        `;
+        div.textContent = speler.naam;
 
-document.addEventListener("DOMContentLoaded", () => {
+        div.addEventListener("click", () => {
+          document.querySelectorAll(".speler-blok").forEach(el => el.style.backgroundColor = "#e0e0e0");
+          div.style.backgroundColor = "#b0c4de";
+          geselecteerdeSpeler = speler.naam;
+        });
+
+        grid.appendChild(div);
+      });
+  }
+
+  function registreerActie(type) {
+    if (!geselecteerdeSpeler) {
+      alert("Selecteer eerst een speler.");
+      return;
+    }
+
+    const stats = JSON.parse(localStorage.getItem("playerStats") || "{}");
+    if (!stats[geselecteerdeSpeler]) {
+      stats[geselecteerdeSpeler] = { goals: 0, attempts: 0 };
+    }
+
+    if (type === "goal") {
+      stats[geselecteerdeSpeler].goals += 1;
+    } else if (type === "attempt") {
+      stats[geselecteerdeSpeler].attempts += 1;
+    }
+
+    localStorage.setItem("playerStats", JSON.stringify(stats));
+    alert(`${type === "goal" ? "Doelpunt" : "Doelpoging"} geregistreerd voor ${geselecteerdeSpeler}`);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("doelpuntBtn").addEventListener("click", () => registreerActie("goal"));
+    document.getElementById("doelpogingBtn").addEventListener("click", () => registreerActie("attempt"));
+  });
+</script>
+<script>
+  function updateActieveSpelers() {
+    const spelers = JSON.parse(localStorage.getItem("spelers")) || [];
+    const actiefVak = localStorage.getItem("actiefVak") || "A";
+    const grid = document.getElementById("actieveSpelersGrid");
+    grid.innerHTML = "";
+
+    const vakNaam = actiefVak === "A" ? "aanval" : "verdediging";
+    spelers
+      .filter(speler => speler.vak === vakNaam)
+      .forEach(speler => {
+        const div = document.createElement("div");
+        div.className = "speler-blok";
+        div.style = `
+          background-color: #e0e0e0;
+          padding: 1rem;
+          border-radius: 6px;
+          text-align: center;
+          font-weight: bold;
+        `;
+        div.textContent = speler.naam;
+        grid.appendChild(div);
+      });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
     updateActieveSpelers();
-    document.getElementById("wisselBtn").addEventListener("click", () => {
-        // wisselmenu logica
-    });
+
     const balKnop = document.createElement("button");
     balKnop.textContent = "Bal naar andere kant";
     balKnop.style = "display:block;margin:1rem auto;padding:0.5rem 1rem;";
     balKnop.addEventListener("click", () => {
-        const huidig = localStorage.getItem("actiefVak") || "A";
-        const nieuw = huidig === "A" ? "B" : "A";
-        localStorage.setItem("actiefVak", nieuw);
-        document.getElementById("eersteAanvalsvak").classList.toggle("actief", nieuw === "A");
-        document.getElementById("eersteVerdedigingsvak").classList.toggle("actief", nieuw === "B");
-        updateActieveSpelers();
+      const huidig = localStorage.getItem("actiefVak") || "A";
+      const nieuw = huidig === "A" ? "B" : "A";
+      localStorage.setItem("actiefVak", nieuw);
+      document.getElementById("eersteAanvalsvak").classList.toggle("actief", nieuw === "A");
+      document.getElementById("eersteVerdedigingsvak").classList.toggle("actief", nieuw === "B");
+      updateActieveSpelers();
     });
     document.body.appendChild(balKnop);
-});
-</script></body>
+  });
+</script>
+<script>
+  let geselecteerdeSpeler = null;
+
+  function updateActieveSpelers() {
+    const spelers = JSON.parse(localStorage.getItem("spelers")) || [];
+    const actiefVak = localStorage.getItem("actiefVak") || "A";
+    const grid = document.getElementById("actieveSpelersGrid");
+    grid.innerHTML = "";
+
+    const vakNaam = actiefVak === "A" ? "aanval" : "verdediging";
+    spelers
+      .filter(speler => speler.vak === vakNaam)
+      .forEach(speler => {
+        const div = document.createElement("div");
+        div.className = "speler-blok";
+        div.textContent = speler.naam;
+
+        div.addEventListener("click", () => {
+          document.querySelectorAll(".speler-blok").forEach(el => el.classList.remove("geselecteerd"));
+          div.classList.add("geselecteerd");
+          geselecteerdeSpeler = speler.naam;
+        });
+
+        grid.appendChild(div);
+      });
+  }
+
+  function registreerActie(type) {
+    if (!geselecteerdeSpeler) {
+      alert("Selecteer eerst een speler.");
+      return;
+    }
+
+    const stats = JSON.parse(localStorage.getItem("playerStats") || "{}");
+    if (!stats[geselecteerdeSpeler]) {
+      stats[geselecteerdeSpeler] = { goals: 0, attempts: 0 };
+    }
+
+    if (type === "goal") {
+      stats[geselecteerdeSpeler].goals += 1;
+    } else if (type === "attempt") {
+      stats[geselecteerdeSpeler].attempts += 1;
+    }
+
+    localStorage.setItem("playerStats", JSON.stringify(stats));
+    alert(`${type === "goal" ? "Doelpunt" : "Doelpoging"} geregistreerd voor ${geselecteerdeSpeler}`);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updateActieveSpelers();
+    document.getElementById("doelpuntBtn").addEventListener("click", () => registreerActie("goal"));
+    document.getElementById("doelpogingBtn").addEventListener("click", () => registreerActie("attempt"));
+  });
+</script>
+</body>
 </html>
