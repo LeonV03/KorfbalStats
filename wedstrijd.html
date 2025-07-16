@@ -8,18 +8,25 @@
 </head>
 <body>
   <main id="gameScreen">
-    <button id="switchVakBtn">Bal naar andere vak</button>
-    <div id="spelersVak" class="vakContainer"></div>
+    <button id="switchVakBtn" class="switchVakBtn">Bal naar andere vak</button>
+    
+    <div class="wedstrijdContainer">
+      <div class="spelerKolom">
+        <h2 id="actiefVakLabel"></h2>
+        <div id="spelersVak" class="vakContainer"></div>
+        <div id="wisselContainer">
+          <button id="wisselBtn">Wissels</button>
+        </div>
+        <div id="standContainer"></div>
+      </div>
 
-    <div class="actieKnoppen">
-      <button id="goalBtn">Doelpunt</button>
-      <button id="shotBtn">Schot</button>
-      <button id="wisselBtn">Wissels</button>
-    </div>
-
-    <div id="statsContainer">
-      <p id="actiefVakLabel"></p>
-      <p id="aanvalTeller"></p>
+      <div class="veldKolom">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Korfbalveld_outdoor.png/320px-Korfbalveld_outdoor.png" alt="Korfbalveld" class="veldAfbeelding"/>
+        <div class="actieKnoppen">
+          <button id="goalBtn">Doelpunt</button>
+          <button id="shotBtn">Schot</button>
+        </div>
+      </div>
     </div>
   </main>
 
