@@ -41,27 +41,41 @@ function initSetup() {
     toonSpelers();
   };
 
+  function verwijderSpeler(id) {
+    spelers = spelers.filter(speler => speler.id !== id);
+    toonSpelers();
+  }
+
   function toonSpelers() {
     playerList.innerHTML = "";
     spelers.forEach(speler => {
       const li = document.createElement("li");
       li.textContent = speler.naam;
 
+      const acties = document.createElement("div");
+      acties.className = "player-actions";
+
       const btnAanval = document.createElement("button");
-      btnAanval.textContent = "Aanvalsvak";
+      btnAanval.textContent = "Aanval";
       btnAanval.onclick = () => toewijzen(speler.id, "aanval");
 
       const btnVerdediging = document.createElement("button");
-      btnVerdediging.textContent = "Verdedigingsvak";
+      btnVerdediging.textContent = "Verdediging";
       btnVerdediging.onclick = () => toewijzen(speler.id, "verdediging");
 
       const btnWissel = document.createElement("button");
-      btnWissel.textContent = "Wissels";
+      btnWissel.textContent = "Wissel";
       btnWissel.onclick = () => toewijzen(speler.id, "wissel");
 
-      li.appendChild(btnAanval);
-      li.appendChild(btnVerdediging);
-      li.appendChild(btnWissel);
+      const btnVerwijder = document.createElement("button");
+      btnVerwijder.textContent = "Verwijder";
+      btnVerwijder.onclick = () => verwijderSpeler(speler.id);
+
+      acties.appendChild(btnAanval);
+      acties.appendChild(btnVerdediging);
+      acties.appendChild(btnWissel);
+      acties.appendChild(btnVerwijder);
+      li.appendChild(acties);
       playerList.appendChild(li);
     });
     toonVakken();
@@ -80,9 +94,16 @@ function initSetup() {
     vakAanval.innerHTML = "";
     vakVerdediging.innerHTML = "";
     vakWissels.innerHTML = "";
+
     spelers.forEach(speler => {
       const li = document.createElement("li");
       li.textContent = speler.naam;
+
+      const btnVerwijder = document.createElement("button");
+      btnVerwijder.textContent = "Verwijder";
+      btnVerwijder.onclick = () => verwijderSpeler(speler.id);
+      li.appendChild(btnVerwijder);
+
       if (speler.vak === "aanval") vakAanval.appendChild(li);
       else if (speler.vak === "verdediging") vakVerdediging.appendChild(li);
       else if (speler.vak === "wissel") vakWissels.appendChild(li);
