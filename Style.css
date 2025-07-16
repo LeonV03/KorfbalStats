@@ -34,3 +34,19 @@ ul {
   list-style-type: none;
   padding: 0;
 }
+
+.vakContainer {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.actieKnoppen {
+  margin: 1rem 0;
+}
+
+.actieKnoppen button {
+  padding: 1rem;
+  font-size: 1rem;
+}
+
