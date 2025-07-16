@@ -1,21 +1,17 @@
 let spelers = JSON.parse(localStorage.getItem("spelers")) || [];
-let actiefVak = "A"; // wisselt tussen A en B
+let actiefVak = "A"; // A = aanval, B = verdediging
 let aanvallen = { A: 0, B: 0 };
-let doelpunten = { A: 0, B: 0 };
 let doelpuntenTeller = 0;
 let geselecteerdeSpeler = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.location.pathname.includes("wedstrijd.html")) {
     initWedstrijd();
-  } else if (window.location.pathname.includes("statistieken.html")) {
-    initStatistieken();
   } else {
     initSetup();
   }
 });
 
-// === SETUP SCHERM ===
 function initSetup() {
   const playerNameInput = document.getElementById("playerName");
   const addPlayerBtn = document.getElementById("addPlayerBtn");
@@ -25,7 +21,7 @@ function initSetup() {
   const vakWissels = document.getElementById("vakWissels");
   const startGameBtn = document.getElementById("startGameBtn");
 
-  spelers = [];
+  toonSpelers();
 
   addPlayerBtn.onclick = () => {
     const naam = playerNameInput.value.trim();
@@ -48,23 +44,21 @@ function initSetup() {
       btnVerdediging.textContent = "Verdedigingsvak";
       btnVerdediging.onclick = () => toewijzen(speler.id, "verdediging");
       const btnWissel = document.createElement("button");
-      btnWissel.textContent = "Wissels";
+      btnWissel.textContent = "Wissel";
       btnWissel.onclick = () => toewijzen(speler.id, "wissel");
       li.appendChild(btnAanval);
       li.appendChild(btnVerdediging);
       li.appendChild(btnWissel);
       playerList.appendChild(li);
     });
-
     toonVakken();
     controleerStartknop();
   }
 
   function toewijzen(id, vak) {
-    spelers = spelers.map(speler => {
-      if (speler.id === id) return { ...speler, vak };
-      return speler;
-    });
+    spelers = spelers.map(speler =>
+      speler.id === id ? { ...speler, vak } : speler
+    );
     toonSpelers();
   }
 
@@ -72,7 +66,6 @@ function initSetup() {
     vakAanval.innerHTML = "";
     vakVerdediging.innerHTML = "";
     vakWissels.innerHTML = "";
-
     spelers.forEach(speler => {
       const li = document.createElement("li");
       li.textContent = speler.naam;
@@ -85,11 +78,7 @@ function initSetup() {
   function controleerStartknop() {
     const aanvalCount = spelers.filter(s => s.vak === "aanval").length;
     const verdedigingCount = spelers.filter(s => s.vak === "verdediging").length;
-    if (aanvalCount === 4 && verdedigingCount === 4) {
-      startGameBtn.disabled = false;
-    } else {
-      startGameBtn.disabled = true;
-    }
+    startGameBtn.disabled = !(aanvalCount === 4 && verdedigingCount === 4);
   }
 
   startGameBtn.onclick = () => {
@@ -98,21 +87,8 @@ function initSetup() {
   };
 }
 
-// === WEDSTRIJD SCHERM ===
-let spelers = JSON.parse(localStorage.getItem("spelers")) || [];
-let actiefVak = "A";
-let aanvallen = { A: 0, B: 0 };
-let doelpunten = { A: 0, B: 0 };
-let doelpuntenTeller = 0;
-let geselecteerdeSpeler = null;
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (window.location.pathname.includes("wedstrijd.html")) {
-    initWedstrijd();
-  }
-});
-
 function initWedstrijd() {
+  spelers = JSON.parse(localStorage.getItem("spelers")) || [];
   toonActiefVak();
   toonStand();
 
@@ -148,8 +124,10 @@ function selecteerSpeler(id, btn) {
 }
 
 function toonStand() {
+  const doelpuntenVoorA = spelers.filter(s => s.vak === "aanval" && s.stats?.doelpuntVoor).reduce((a,b) => a+b.stats.doelpuntVoor,0);
+  const doelpuntenVoorB = spelers.filter(s => s.vak === "verdediging" && s.stats?.doelpuntVoor).reduce((a,b) => a+b.stats.doelpuntVoor,0);
   document.getElementById("standContainer").textContent =
-    `Stand: A ${doelpunten.A} - B ${doelpunten.B}`;
+    `Stand: A ${doelpuntenVoorA} - B ${doelpuntenVoorB}`;
 }
 
 function registreerActie(type) {
@@ -158,15 +136,19 @@ function registreerActie(type) {
     return;
   }
 
+  const vak = actiefVak === "A" ? "aanval" : "verdediging";
+  const isAanval = vak === "aanval";
+
   spelers = spelers.map(speler => {
     if (speler.id === geselecteerdeSpeler) {
-      if (!speler.stats) speler.stats = { schot: 0, doelpunt: 0 };
+      if (!speler.stats) speler.stats = { schotVoor:0, doelpuntVoor:0, schotTegen:0, doelpuntTegen:0 };
       if (type === "doelpunt") {
-        speler.stats.doelpunt++;
-        doelpunten[actiefVak]++;
+        if (isAanval) speler.stats.doelpuntVoor++;
+        else speler.stats.doelpuntTegen++;
         doelpuntenTeller++;
       } else {
-        speler.stats.schot++;
+        if (isAanval) speler.stats.schotVoor++;
+        else speler.stats.schotTegen++;
       }
     }
     return speler;
@@ -195,26 +177,4 @@ function wisselFunctie() {
     if (speler.vak === "verdediging") return { ...speler, vak: "aanval" };
     return speler;
   });
-}
-
-// === STATISTIEKEN SCHERM ===
-function initStatistieken() {
-  const tabel = document.getElementById("statsTableBody");
-  spelers.forEach(speler => {
-    const row = document.createElement("tr");
-    const schoten = speler.stats?.schot || 0;
-    const doelpunten = speler.stats?.doelpunt || 0;
-    const perc = schoten > 0 ? ((doelpunten / schoten) * 100).toFixed(1) + "%" : "-";
-
-    row.innerHTML = `
-      <td>${speler.naam}</td>
-      <td>${schoten}</td>
-      <td>${doelpunten}</td>
-      <td>${perc}</td>
-    `;
-    tabel.appendChild(row);
-  });
-
-  document.getElementById("aanvalTellerStats").textContent =
-    `Aanvallen A: ${aanvallen.A} | B: ${aanvallen.B}`;
 }
