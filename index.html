@@ -102,6 +102,20 @@
       background-color: #0077cc;
       color: white;
     }
+	#vakkenContainer ul {
+  list-style: none;
+  padding: 0;
+}
+
+.verwijder-knop {
+  margin-left: 10px;
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
   </style>
 </head>
 <body>
@@ -135,21 +149,21 @@
     <h3>Gemaakte spelers</h3>
     <ul id="playerList"></ul>
 
-    <h3>Toewijzen aan vakken</h3>
-    <div class="vak-container">
-      <div class="vak vak-blok">
-        <h4>1e aanvalsvak</h4>
-        <ul id="vakAanval"></ul>
-      </div>
-      <div class="vak vak-blok">
-        <h4>1e verdedigingsvak</h4>
-        <ul id="vakVerdediging"></ul>
-      </div>
-      <div class="vak vak-blok">
-        <h4>Wissels</h4>
-        <ul id="vakWissels"></ul>
-      </div>
-    </div>
+<div id="vakkenContainer" style="display: flex; justify-content: space-between; gap: 10px;">
+  <div style="flex: 1;">
+    <h5>1e aanvalsvak</h5>
+    <ul id="vakAanval"></ul>
+  </div>
+  <div style="flex: 1;">
+    <h5>1e verdedigingsvak</h5>
+    <ul id="vakVerdediging"></ul>
+  </div>
+  <div style="flex: 1;">
+    <h5>Wissels</h5>
+    <ul id="vakWissels"></ul>
+  </div>
+</div>
+
 
     <button id="startGameBtn" disabled>Ga naar wedstrijd</button>
   </div>
