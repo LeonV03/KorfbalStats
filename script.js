@@ -1,6 +1,6 @@
 // === Toevoegen van teamnaamvelden ===
-const teamThuisInput = document.getElementById("teamThuis");
-const teamUitInput = document.getElementById("teamUit");
+const teamThuisInput = document.getElementById("team 1");
+const teamUitInput = document.getElementById("team 2");
 
 let spelers = JSON.parse(localStorage.getItem("spelers")) || [];
 let actiefVak = "A";
@@ -10,8 +10,8 @@ let doelpuntenTeller = 0;
 let geselecteerdeSpeler = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  const teamThuisInput = document.getElementById("teamThuis");
-  const teamUitInput = document.getElementById("teamUit");
+  const teamThuisInput = document.getElementById("team 1");
+  const teamUitInput = document.getElementById("team 2");
   const playerNameInput = document.getElementById("playerName");
   const addPlayerBtn = document.getElementById("addPlayerBtn");
   const playerList = document.getElementById("playerList");
@@ -187,17 +187,31 @@ function initSetup() {
     toonSpelers();
   }
 
-  function toonVakken() {
-    vakAanval.innerHTML = "";
-    vakVerdediging.innerHTML = "";
-    vakWissels.innerHTML = "";
-    spelers.forEach(speler => {
-      const li = document.createElement("li");
-      li.textContent = speler.naam;
-      if (speler.vak === "aanval") vakAanval.appendChild(li);
-      else if (speler.vak === "verdediging") vakVerdediging.appendChild(li);
-      else if (speler.vak === "wissel") vakWissels.appendChild(li);
-    });
+function toonVakken() {
+  vakAanval.innerHTML = "";
+  vakVerdediging.innerHTML = "";
+  vakWissels.innerHTML = "";
+
+  spelers.forEach(speler => {
+    if (!speler.vak) return;
+
+    const li = document.createElement("li");
+    li.textContent = speler.naam;
+    li.style.backgroundColor = "gold"; // visuele markering
+    li.style.padding = "5px";
+    li.style.marginBottom = "5px";
+    li.style.borderRadius = "5px";
+
+    const verwijderBtn = document.createElement("button");
+    verwijderBtn.textContent = "✖";
+    verwijderBtn.className = "verwijder-knop";
+    verwijderBtn.onclick = () => verwijderSpeler(speler.id);
+    li.appendChild(verwijderBtn);
+
+    if (speler.vak === "aanval") vakAanval.appendChild(li);
+    else if (speler.vak === "verdediging") vakVerdediging.appendChild(li);
+    else if (speler.vak === "wissel") vakWissels.appendChild(li);
+  });
   }
 
   function controleerStartknop() {
