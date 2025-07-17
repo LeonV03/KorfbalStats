@@ -2,7 +2,7 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <title>Korfbal Setup</title>
+  <title>Wedstrijd Setup</title>
   <style>
     body {
       font-family: 'Segoe UI', sans-serif;
@@ -52,42 +52,30 @@
     }
     li {
       background-color: #fff;
-      margin: 5px 0;
+      margin: 0px 0;
       padding: 10px;
       border-radius: 4px;
-      display: flex;
+      display: grid;
+      grid-template-columns: 160px 1fr 1fr 1fr 30px; /* Naam, 3 vakken, kruisje */
+      gap: 5px;
       justify-content: space-between;
       align-items: center;
-      flex-wrap: wrap;
-    }
-    .vak-blok {
-      background-color: #e9f0f7;
-      padding: 15px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      margin-left: 20px;
-    }
-    .vak-container {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-    .vak {
-      flex: 1;
-      min-width: 250px;
-    }
+      flex-wrap: nowrap;
+	}
+
     .verwijder-knop {
       background-color: #e74c3c;
       color: white;
       font-weight: bold;
       border: none;
       border-radius: 4px;
-      padding: 5px 10px;
-      margin-left: 10px;
+      padding: 8.5px 5px;
+      margin-left: 0px;
       cursor: pointer;
     }
-    .verwijder-knop:hover {
-      background-color: #c0392b;
+	
+    #speler-form {
+      margin-bottom: 20px;
     }
     .mode-buttons {
       display: flex;
@@ -102,34 +90,20 @@
       background-color: #0077cc;
       color: white;
     }
-	#vakkenContainer ul {
-  list-style: none;
-  padding: 0;
-}
-
-.verwijder-knop {
-  margin-left: 10px;
-  background-color: red;
-  color: white;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-}
-
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Korfbal Setup</h1>
+    <h1>Wedstrijd Setup</h1>
 
     <div class="input-group">
-      <label for="teamThuis">Team Thuis:</label>
-      <input type="text" id="teamThuis" placeholder="Naam thuisteam" />
+      <label for="teamThuis">Team 1:</label>
+      <input type="text" id="teamThuis" placeholder="Naam team 1" />
     </div>
 
     <div class="input-group">
-      <label for="teamUit">Team Uit:</label>
-      <input type="text" id="teamUit" placeholder="Naam uitteam" />
+      <label for="teamUit">Team 2:</label>
+      <input type="text" id="teamUit" placeholder="Naam team 2" />
     </div>
 
     <div class="input-group">
