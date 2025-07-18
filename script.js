@@ -113,4 +113,62 @@
       alert("Zorg dat er 1-4 spelers in zowel aanval als verdediging staan.");
     }
   });
+// Spelersdata met statistieken
+let spelersData = JSON.parse(localStorage.getItem("spelersData")) || {
+  aanval: { vak1: [] },
+  verdediging: { vak1: [] },
+  wissels: []
+};
+
+// Voorbeeld: speler toevoegen (kan vervangen worden door dynamische invoer)
+spelersData.aanval.vak1.push({ naam: "Speler A", doelpunten: 2, pogingen: 5 });
+spelersData.verdediging.vak1.push({ naam: "Speler B", doelpunten: 1, pogingen: 3 });
+spelersData.wissels.push({ naam: "Speler C", doelpunten: 0, pogingen: 0 });
+
+// Opslaan in localStorage
+function saveData() {
+  localStorage.setItem("spelersData", JSON.stringify(spelersData));
+}
+
+// Wissel uitvoeren
+function wisselSpeler(veldType, vak, veldIndex, wisselIndex) {
+  const veldSpeler = spelersData[veldType][vak][veldIndex];
+  const wisselSpeler = spelersData.wissels[wisselIndex];
+
+  // Wissel de spelers
+  spelersData[veldType][vak][veldIndex] = wisselSpeler;
+  spelersData.wissels[wisselIndex] = veldSpeler;
+
+  saveData();
+  alert(`Wissel uitgevoerd: ${wisselSpeler.naam} voor ${veldSpeler.naam}`);
+  location.reload(); // herlaad om wijzigingen te tonen
+}
+
+// Statistieken tonen in HTML
+function toonStatistieken() {
+  const aanvalTabel = document.querySelector("#aanval-vak1");
+  const verdedigingTabel = document.querySelector("#verdediging-vak1");
+
+  spelersData.aanval.vak1.forEach(speler => {
+    aanvalTabel.innerHTML += `
+      <tr>
+        <td>${speler.naam}</td>
+        <td>${speler.doelpunten}</td>
+        <td>${speler.pogingen}</td>
+        <td>${(speler.pogingen > 0 ? (speler.doelpunten / speler.pogingen * 100).toFixed(1) : 0)}%</td>
+      </tr>`;
+  });
+
+  spelersData.verdediging.vak1.forEach(speler => {
+    verdedigingTabel.innerHTML += `
+      <tr>
+        <td>${speler.naam}</td>
+        <td>${speler.doelpunten}</td>
+        <td>${speler.pogingen}</td>
+        <td>${(speler.pogingen > 0 ? (speler.doelpunten / speler.pogingen * 100).toFixed(1) : 0)}%</td>
+      </tr>`;
+  });
+}
+
+document.addEventListener("DOMContentLoaded", toonStatistieken);
 </script>
