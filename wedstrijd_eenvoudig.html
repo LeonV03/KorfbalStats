@@ -59,62 +59,21 @@
     </style>
 </head>
 <body>
-<style>
-#menuToggle {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 1;
-}
-#menuContent {
-  display: none;
-  position: absolute;
-  top: 40px;
-  left: 10px;
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  padding: 10px;
-  z-index: 2;
-}
-#menuContent button {
-  display: block;
-  margin: 5px 0;
-}
-#wisselPaneel {
-  display: none;
-  position: absolute;
-  top: 100px;
-  left: 10px;
-  background: #fff;
-  border: 1px solid #aaa;
-  padding: 10px;
-  z-index: 3;
-}
-</style>
-<div id="menuToggle">
+<div id="menuToggle" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
 <button onclick="toggleMenu()">☰ Menu</button>
+<div id="menuPanel" style="display: none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc;">
+<button onclick="showWissels()">Wissels</button>
+<button onclick="showStats()">Statistieken</button>
 </div>
-<div id="menuContent">
-<button onclick="openWissels()">Wissels</button>
-<button onclick="openStatistieken()">Statistieken</button>
 </div>
-<div id="wisselPaneel">
+<div id="wisselPaneel" style="display: none; position: absolute; top: 60px; left: 10px; background: #fff; border: 1px solid #ccc; padding: 10px; z-index: 999;">
 <h3>Wissels</h3>
-<div id="wisselSpelers"></div>
-<div id="wisselActie"></div>
+<div id="wisselLijst"></div>
 </div>
-<script>
-function toggleMenu() {
-  const menu = document.getElementById("menuContent");
-  menu.style.display = menu.style.display === "block" ? "none" : "block";
-}
-function openWissels() {
-  document.getElementById("wisselPaneel").style.display = "block";
-}
-function openStatistieken() {
-  alert("Statistieken-tabblad wordt later toegevoegd.");
-}
-</script>
+<div id="statistiekPaneel" style="display: none; position: absolute; top: 60px; left: 10px; background: #fff; border: 1px solid #ccc; padding: 10px; z-index: 999;">
+<h3>Statistieken</h3>
+<p>Statistieken per vak worden hier later weergegeven.</p>
+</div>
 
 <div class="scoreboard">
 <div id="team1Naam">Team 1</div>
@@ -241,5 +200,63 @@ function openStatistieken() {
 
         updateStats();
     </script>
-</body>
+<script>
+function toggleMenu() {
+  const panel = document.getElementById("menuPanel");
+  panel.style.display = panel.style.display === "none" ? "block" : "none";
+}
+
+function showWissels() {
+  document.getElementById("wisselPaneel").style.display = "block";
+  document.getElementById("statistiekPaneel").style.display = "none";
+  laadWissels();
+}
+
+function showStats() {
+  document.getElementById("wisselPaneel").style.display = "none";
+  document.getElementById("statistiekPaneel").style.display = "block";
+}
+
+function laadWissels() {
+  const wisselLijst = document.getElementById("wisselLijst");
+  wisselLijst.innerHTML = "";
+  const spelers = JSON.parse(localStorage.getItem("spelers") || "[]");
+  const wissels = spelers.filter(s => s.vak === "wissel");
+  const aanval = spelers.filter(s => s.vak === "aanval");
+  const verdediging = spelers.filter(s => s.vak === "verdediging");
+
+  wissels.forEach(wissel => {
+    const div = document.createElement("div");
+    div.textContent = wissel.naam + " wisselen met: ";
+    const select = document.createElement("select");
+    [...aanval, ...verdediging].forEach(s => {
+      const opt = document.createElement("option");
+      opt.value = s.naam;
+      opt.textContent = s.naam;
+      select.appendChild(opt);
+    });
+    const btn = document.createElement("button");
+    btn.textContent = "Wissel";
+    btn.onclick = () => {
+      const targetNaam = select.value;
+      const confirmSwap = confirm(`Wilt u ${wissel.naam} wisselen voor ${targetNaam}?`);
+      if (confirmSwap) {
+        const target = spelers.find(s => s.naam === targetNaam);
+        const wisselIndex = spelers.findIndex(s => s.naam === wissel.naam);
+        const targetIndex = spelers.findIndex(s => s.naam === targetNaam);
+
+        const tempVak = target.vak;
+        target.vak = "wissel";
+        spelers[wisselIndex].vak = tempVak;
+
+        localStorage.setItem("spelers", JSON.stringify(spelers));
+        location.reload();
+      }
+    };
+    div.appendChild(select);
+    div.appendChild(btn);
+    wisselLijst.appendChild(div);
+  });
+}
+</script></body>
 </html>
