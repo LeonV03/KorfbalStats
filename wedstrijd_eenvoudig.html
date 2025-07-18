@@ -58,10 +58,10 @@
         }
     </style>
 </head>
-<body style="margin-top: 60px;"><button id="wisselsToggle" style="position: fixed; top: 10px; left: 10px; z-index: 1000; padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Wissels</button><button id="statistiekenButton" style="position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px 20px; background-color: #28A745; color: white; border: none; border-radius: 5px; cursor: pointer;">Statistieken</button>
+<body style="margin-top: 60px;"><button id="openWisselPaneel">Wissel</button><button id="wisselsToggle" style="position: fixed; top: 10px; left: 10px; z-index: 1000; padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Wissels</button><button id="statistiekenButton" style="position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px 20px; background-color: #28A745; color: white; border: none; border-radius: 5px; cursor: pointer;">Statistieken</button>
 <div id="menuToggle" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
 </div>
-<div id="wisselPaneel" style="display: none; position: absolute; top: 60px; left: 10px; background: #fff; border: 1px solid #ccc; padding: 10px; z-index: 999;"><button id="openWisselPaneel">Wissel</button>
+<div id="wisselPaneel" style="display: none; position: absolute; top: 60px; left: 10px; background: #fff; border: 1px solid #ccc; padding: 10px; z-index: 999;">
 <h3>Wissels</h3>
 <div id="wisselLijst"></div>
 </div>
@@ -304,51 +304,19 @@ function bevestigWissel() {
   closeWisselPaneel();
 }
 </script>
-
-<div id="wisselPaneel" style="display:none; border:1px solid #ccc; padding:10px; margin-top:10px;">
-<h3>Wisselpaneel</h3>
-<label for="spelerUit">Speler eruit:</label>
-<select id="spelerUit"></select><br/><br/>
-<label for="spelerIn">Speler erin:</label>
-<select id="spelerIn"></select><br/><br/>
-<button onclick="wisselUitvoeren()">Wissel uitvoeren</button>
-<div id="wisselLog" style="margin-top:10px;"></div>
-</div>
 <script>
-document.getElementById("openWisselPaneel").addEventListener("click", function() {
-    var panel = document.getElementById("wisselPaneel");
-    panel.style.display = panel.style.display === "none" ? "block" : "none";
-});
-
-function laadSpelers() {
-    const spelersData = JSON.parse(localStorage.getItem("spelers") || "[]");
-    const spelerUit = document.getElementById("spelerUit");
-    const spelerIn = document.getElementById("spelerIn");
-    spelerUit.innerHTML = "";
-    spelerIn.innerHTML = "";
-    spelersData.forEach(speler => {
-        const option1 = document.createElement("option");
-        option1.value = speler.naam;
-        option1.textContent = speler.naam;
-        spelerUit.appendChild(option1);
-        const option2 = document.createElement("option");
-        option2.value = speler.naam;
-        option2.textContent = speler.naam;
-        spelerIn.appendChild(option2);
-    });
-}
-
-function wisselUitvoeren() {
-    const uit = document.getElementById("spelerUit").value;
-    const inSpeler = document.getElementById("spelerIn").value;
-    const log = document.getElementById("wisselLog");
-    if (uit && inSpeler && uit !== inSpeler) {
-        log.innerHTML += `<p>${uit} gewisseld voor ${inSpeler}</p>`;
-    } else {
-        alert("Selecteer twee verschillende spelers.");
+document.addEventListener("DOMContentLoaded", function() {
+    const knop = document.getElementById("openWisselPaneel");
+    const paneel = document.getElementById("wisselPaneel");
+    if (knop && paneel) {
+        knop.addEventListener("click", function() {
+            if (paneel.style.display === "none") {
+                paneel.style.display = "block";
+            } else {
+                paneel.style.display = "none";
+            }
+        });
     }
-}
-
-window.onload = laadSpelers;
+});
 </script></body>
 </html>
