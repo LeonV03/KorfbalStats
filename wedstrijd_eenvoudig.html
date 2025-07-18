@@ -59,46 +59,21 @@
     </style>
 </head>
 <body>
-<div id="menuButton" style="position: absolute; top: 10px; left: 10px; z-index: 1000; cursor: pointer; background: #eee; padding: 5px 10px; border-radius: 4px;">
-    ☰ Menu
+<div id="menuToggle" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
+<button onclick="toggleMenu()">☰ Menu</button>
+<div id="menuPanel" style="display: none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc;">
+<button onclick="showWissels()">Wissels</button>
+<button onclick="showStats()">Statistieken</button>
 </div>
-<div id="menuPanel" style="display: none; position: absolute; top: 50px; left: 10px; background: white; border: 1px solid #ccc; padding: 10px; z-index: 999;">
-<div><button onclick="openWisselPanel()">Wissels</button></div>
-<div><button onclick="openStatsPanel()">Statistieken</button></div>
 </div>
-<div id="wisselPanel" style="display: none; position: absolute; top: 120px; left: 10px; background: #f9f9f9; border: 1px solid #aaa; padding: 10px; z-index: 998;">
-<p>Wisselpaneel komt hier.</p>
+<div id="wisselPaneel" style="display: none; position: absolute; top: 60px; left: 10px; background: #fff; border: 1px solid #ccc; padding: 10px; z-index: 999;">
+<h3>Wissels</h3>
+<div id="wisselLijst"></div>
 </div>
-<div id="statsPanel" style="display: none; position: absolute; top: 120px; left: 10px; background: #f0f0f0; border: 1px solid #aaa; padding: 10px; z-index: 998;">
-<p>Statistiekenpaneel (placeholder).</p>
+<div id="statistiekPaneel" style="display: none; position: absolute; top: 60px; left: 10px; background: #fff; border: 1px solid #ccc; padding: 10px; z-index: 999;">
+<h3>Statistieken</h3>
+<p>Statistieken per vak worden hier later weergegeven.</p>
 </div>
-<script>
-    const menuBtn = document.getElementById("menuButton");
-    const menuPanel = document.getElementById("menuPanel");
-    const wisselPanel = document.getElementById("wisselPanel");
-    const statsPanel = document.getElementById("statsPanel");
-
-    menuBtn.onclick = () => {
-        const isVisible = menuPanel.style.display === "block";
-        menuPanel.style.display = isVisible ? "none" : "block";
-        if (!isVisible) {
-            wisselPanel.style.display = "none";
-            statsPanel.style.display = "none";
-        }
-    };
-
-    function openWisselPanel() {
-        wisselPanel.style.display = "block";
-        statsPanel.style.display = "none";
-        menuPanel.style.display = "none";
-    }
-
-    function openStatsPanel() {
-        statsPanel.style.display = "block";
-        wisselPanel.style.display = "none";
-        menuPanel.style.display = "none";
-    }
-</script>
 
 <div class="scoreboard">
 <div id="team1Naam">Team 1</div>
@@ -230,7 +205,8 @@ verdedigingSpelers.forEach(speler => {
 
 updateStats();
     </script>
-	<script>
+    </script>
+<script>
 function toggleMenu() {
   const panel = document.getElementById("menuPanel");
   panel.style.display = panel.style.display === "none" ? "block" : "none";
@@ -288,6 +264,5 @@ function laadWissels() {
     wisselLijst.appendChild(div);
   });
 }
-</script>
-</body>
+</script></body>
 </html>
