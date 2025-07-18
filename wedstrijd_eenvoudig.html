@@ -58,14 +58,10 @@
         }
     </style>
 </head>
-<body>
+<body style="margin-top: 60px;"><button id="wisselsToggle" style="position: fixed; top: 10px; left: 10px; z-index: 1000; padding: 10px 20px; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer;">Wissels</button><button id="statistiekenButton" style="position: fixed; top: 10px; right: 10px; z-index: 1000; padding: 10px 20px; background-color: #28A745; color: white; border: none; border-radius: 5px; cursor: pointer;">Statistieken</button>
 <div id="menuToggle" style="position: absolute; top: 10px; left: 10px; z-index: 1000;">
-<button onclick="toggleMenu()">☰ Menu</button>
-<div id="menuPanel" style="display: none; background: #f0f0f0; padding: 10px; border: 1px solid #ccc;">
-<button onclick="showWissels()">Wissels</button>
-<button onclick="showStats()">Statistieken</button>
 </div>
-</div>
+
 <div id="wisselPaneel" style="display: none; position: absolute; top: 60px; left: 10px; background: #fff; border: 1px solid #ccc; padding: 10px; z-index: 999;">
 <h3>Wissels</h3>
 <div id="wisselLijst"></div>
@@ -74,7 +70,6 @@
 <h3>Statistieken</h3>
 <p>Statistieken per vak worden hier later weergegeven.</p>
 </div>
-
 <div class="scoreboard">
 <div id="team1Naam">Team 1</div>
 <div><span id="score1">0</span> - <span id="score2">0</span></div>
@@ -122,7 +117,7 @@
 </div>
 </div>
 </div>
-    <script>
+<script>
 const team1 = localStorage.getItem("team1") || "Team 1";
 const team2 = localStorage.getItem("team2") || "Team 2";
 const spelers = JSON.parse(localStorage.getItem("spelers") || "[]");
@@ -205,7 +200,6 @@ verdedigingSpelers.forEach(speler => {
 
 updateStats();
     </script>
-    </script>
 <script>
 function toggleMenu() {
   const panel = document.getElementById("menuPanel");
@@ -264,5 +258,17 @@ function laadWissels() {
     wisselLijst.appendChild(div);
   });
 }
+</script><script>
+document.getElementById("wisselsToggle").addEventListener("click", function() {
+    const panel = document.getElementById("wisselPaneel");
+    if (panel) {
+        panel.style.display = (panel.style.display === "none" || panel.style.display === "") ? "block" : "none";
+    }
+});
+
+document.getElementById("statistiekenButton").addEventListener("click", function() {
+    // Placeholder for future navigation
+    alert("Statistiekenpagina wordt later toegevoegd.");
+});
 </script></body>
 </html>
