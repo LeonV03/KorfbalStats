@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="nl">
 <head>
-    <meta charset="UTF-8">
-    <title>Wedstrijd Eenvoudig</title>
-    <style>
+<meta charset="utf-8"/>
+<title>Wedstrijd Eenvoudig</title>
+<style>
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
@@ -58,140 +59,187 @@
     </style>
 </head>
 <body>
-
-    <div class="scoreboard">
-        <div id="team1Naam">Team 1</div>
-        <div><span id="score1">0</span> - <span id="score2">0</span></div>
-        <div id="team2Naam">Team 2</div>
-    </div>
-
-    <div class="vak-container">
-        <div class="vak" id="aanvalsvak">
-            <h3>1e Aanvalsvak</h3>
-            <div class="speler-acties" id="aanvalSpelers"></div>
-            <div class="statistieken">
-                <h4>Voor:</h4>
-                <table id="aanvalVoorStats">
-                    <thead>
-                        <tr><th>Speler</th><th>Doelpunten</th><th>Doelpogingen</th><th>Schot%</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <h4>Tegen:</h4>
-                <table id="aanvalTegenStats">
-                    <thead>
-                        <tr><th>Speler</th><th>Doelpunten</th><th>Doelpogingen</th><th>Schot%</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="vak" id="verdedigingsvak">
-            <h3>1e Verdedigingsvak</h3>
-            <div class="speler-acties" id="verdedigingSpelers"></div>
-            <div class="statistieken">
-                <h4>Voor:</h4>
-                <table id="verdedigingVoorStats">
-                    <thead>
-                        <tr><th>Speler</th><th>Doelpunten</th><th>Doelpogingen</th><th>Schot%</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-                <h4>Tegen:</h4>
-                <table id="verdedigingTegenStats">
-                    <thead>
-                        <tr><th>Speler</th><th>Doelpunten</th><th>Doelpogingen</th><th>Schot%</th></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <script>
-const team1 = localStorage.getItem("team1") || "Team 1";
-const team2 = localStorage.getItem("team2") || "Team 2";
-const spelers = JSON.parse(localStorage.getItem("spelers") || "[]");
-
-document.getElementById("team1Naam").textContent = team1;
-document.getElementById("team2Naam").textContent = team2;
-
-let score1 = 0;
-let score2 = 0;
-
-const score1El = document.getElementById("score1");
-const score2El = document.getElementById("score2");
-
-const aanvalSpelers = spelers.filter(s => s.vak === "aanval");
-const verdedigingSpelers = spelers.filter(s => s.vak === "verdediging");
-
-function createSpelerActies(speler, container, statsVoor, statsTegen, team) {
-    const div = document.createElement("div");
-    div.className = "speler";
-
-    const naam = document.createElement("span");
-    naam.textContent = speler.naam;
-    div.appendChild(naam);
-
-    const acties = ["Doelpunt Voor", "Doelpoging Voor", "Doelpunt Tegen", "Doelpoging Tegen"];
-    acties.forEach(actie => {
-        const btn = document.createElement("button");
-        btn.textContent = actie;
-        btn.addEventListener("click", () => {
-            speler[actie] = (speler[actie] || 0) + 1;
-
-            // Automatisch doelpoging registreren bij doelpunt
-            if (actie === "Doelpunt Voor") {
-                speler["Doelpoging Voor"] = (speler["Doelpoging Voor"] || 0) + 1;
-                score1++;
-                score1El.textContent = score1;
-            }
-            if (actie === "Doelpunt Tegen") {
-                speler["Doelpoging Tegen"] = (speler["Doelpoging Tegen"] || 0) + 1;
-                score2++;
-                score2El.textContent = score2;
-            }
-
-            updateStats();
-        });
-        div.appendChild(btn);
-    });
-
-    container.appendChild(div);
+<style>
+#menuToggle {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
 }
-
-function updateStats() {
-    function fillStats(spelers, tableId, voor) {
-        const tbody = document.getElementById(tableId).querySelector("tbody");
-        tbody.innerHTML = "";
-        spelers.forEach(speler => {
-            const row = document.createElement("tr");
-            const naam = speler.naam;
-            const goals = speler[voor ? "Doelpunt Voor" : "Doelpunt Tegen"] || 0;
-            const pogingen = speler[voor ? "Doelpoging Voor" : "Doelpoging Tegen"] || 0;
-            const percentage = pogingen > 0 ? ((goals / pogingen) * 100).toFixed(1) + "%" : "0%";
-            row.innerHTML = `<td>${naam}</td><td>${goals}</td><td>${pogingen}</td><td>${percentage}</td>`;
-            tbody.appendChild(row);
-        });
-    }
-
-    fillStats(aanvalSpelers, "aanvalVoorStats", true);
-    fillStats(aanvalSpelers, "aanvalTegenStats", false);
-    fillStats(verdedigingSpelers, "verdedigingVoorStats", true);
-    fillStats(verdedigingSpelers, "verdedigingTegenStats", false);
+#menuContent {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 10px;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 10px;
+  z-index: 2;
 }
+#menuContent button {
+  display: block;
+  margin: 5px 0;
+}
+#wisselPaneel {
+  display: none;
+  position: absolute;
+  top: 100px;
+  left: 10px;
+  background: #fff;
+  border: 1px solid #aaa;
+  padding: 10px;
+  z-index: 3;
+}
+</style>
+<div id="menuToggle">
+<button onclick="toggleMenu()">☰ Menu</button>
+</div>
+<div id="menuContent">
+<button onclick="openWissels()">Wissels</button>
+<button onclick="openStatistieken()">Statistieken</button>
+</div>
+<div id="wisselPaneel">
+<h3>Wissels</h3>
+<div id="wisselSpelers"></div>
+<div id="wisselActie"></div>
+</div>
+<script>
+function toggleMenu() {
+  const menu = document.getElementById("menuContent");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
+function openWissels() {
+  document.getElementById("wisselPaneel").style.display = "block";
+}
+function openStatistieken() {
+  alert("Statistieken-tabblad wordt later toegevoegd.");
+}
+</script>
 
-aanvalSpelers.forEach(speler => {
-    createSpelerActies(speler, document.getElementById("aanvalSpelers"), "aanvalVoorStats", "aanvalTegenStats", team1);
-});
+<div class="scoreboard">
+<div id="team1Naam">Team 1</div>
+<div><span id="score1">0</span> - <span id="score2">0</span></div>
+<div id="team2Naam">Team 2</div>
+</div>
+<div class="vak-container">
+<div class="vak" id="aanvalsvak">
+<h3>1e Aanvalsvak</h3>
+<div class="speler-acties" id="aanvalSpelers"></div>
+<div class="statistieken">
+<h4>Voor:</h4>
+<table id="aanvalVoorStats">
+<thead>
+<tr><th>Speler</th><th>Doelpunten</th><th>Doelpogingen</th><th>Schot%</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+<h4>Tegen:</h4>
+<table id="aanvalTegenStats">
+<thead>
+<tr><th>Speler</th><th>Doelpunten</th><th>Doelpogingen</th><th>Schot%</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+<div class="vak" id="verdedigingsvak">
+<h3>1e Verdedigingsvak</h3>
+<div class="speler-acties" id="verdedigingSpelers"></div>
+<div class="statistieken">
+<h4>Voor:</h4>
+<table id="verdedigingVoorStats">
+<thead>
+<tr><th>Speler</th><th>Doelpunten</th><th>Doelpogingen</th><th>Schot%</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+<h4>Tegen:</h4>
+<table id="verdedigingTegenStats">
+<thead>
+<tr><th>Speler</th><th>Doelpunten</th><th>Doelpogingen</th><th>Schot%</th></tr>
+</thead>
+<tbody></tbody>
+</table>
+</div>
+</div>
+</div>
+<script>
+        const team1 = localStorage.getItem("team1") || "Team 1";
+        const team2 = localStorage.getItem("team2") || "Team 2";
+        const spelers = JSON.parse(localStorage.getItem("spelers") || "[]");
 
-verdedigingSpelers.forEach(speler => {
-    createSpelerActies(speler, document.getElementById("verdedigingSpelers"), "verdedigingVoorStats", "verdedigingTegenStats", team1);
-});
+        document.getElementById("team1Naam").textContent = team1;
+        document.getElementById("team2Naam").textContent = team2;
 
-updateStats();
+        let score1 = 0;
+        let score2 = 0;
+
+        const score1El = document.getElementById("score1");
+        const score2El = document.getElementById("score2");
+
+        const aanvalSpelers = spelers.filter(s => s.vak === "aanval");
+        const verdedigingSpelers = spelers.filter(s => s.vak === "verdediging");
+
+        function createSpelerActies(speler, container, statsVoor, statsTegen, team) {
+            const div = document.createElement("div");
+            div.className = "speler";
+
+            const naam = document.createElement("span");
+            naam.textContent = speler.naam;
+            div.appendChild(naam);
+
+            const acties = ["Doelpunt Voor", "Doelpoging Voor", "Doelpunt Tegen", "Doelpoging Tegen"];
+            acties.forEach(actie => {
+                const btn = document.createElement("button");
+                btn.textContent = actie;
+                btn.addEventListener("click", () => {
+                    speler[actie] = (speler[actie] || 0) + 1;
+                    if (actie === "Doelpunt Voor") {
+                        score1++;
+                        score1El.textContent = score1;
+                    }
+                    if (actie === "Doelpunt Tegen") {
+                        score2++;
+                        score2El.textContent = score2;
+                    }
+                    updateStats();
+                });
+                div.appendChild(btn);
+            });
+
+            container.appendChild(div);
+        }
+
+        function updateStats() {
+            function fillStats(spelers, tableId, voor) {
+                const tbody = document.getElementById(tableId).querySelector("tbody");
+                tbody.innerHTML = "";
+                spelers.forEach(speler => {
+                    const row = document.createElement("tr");
+                    const naam = speler.naam;
+                    const goals = speler[voor ? "Doelpunt Voor" : "Doelpunt Tegen"] || 0;
+                    const pogingen = speler[voor ? "Doelpoging Voor" : "Doelpoging Tegen"] || 0;
+                    const percentage = pogingen > 0 ? ((goals / pogingen) * 100).toFixed(1) + "%" : "0%";
+                    row.innerHTML = `<td>${naam}</td><td>${goals}</td><td>${pogingen}</td><td>${percentage}</td>`;
+                    tbody.appendChild(row);
+                });
+            }
+
+            fillStats(aanvalSpelers, "aanvalVoorStats", true);
+            fillStats(aanvalSpelers, "aanvalTegenStats", false);
+            fillStats(verdedigingSpelers, "verdedigingVoorStats", true);
+            fillStats(verdedigingSpelers, "verdedigingTegenStats", false);
+        }
+
+        aanvalSpelers.forEach(speler => {
+            createSpelerActies(speler, document.getElementById("aanvalSpelers"), "aanvalVoorStats", "aanvalTegenStats", team1);
+        });
+
+        verdedigingSpelers.forEach(speler => {
+            createSpelerActies(speler, document.getElementById("verdedigingSpelers"), "verdedigingVoorStats", "verdedigingTegenStats", team1);
+        });
+
+        updateStats();
     </script>
-
 </body>
 </html>
