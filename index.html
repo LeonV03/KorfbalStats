@@ -1,49 +1,53 @@
 
 <!DOCTYPE html>
+
 <html lang="nl">
 <head>
-  <meta charset="UTF-8">
-  <title>Wedstrijd Voorbereiding</title>
-  <style>
+<meta charset="utf-8"/>
+<title>Wedstrijd Voorbereiding</title>
+<style>
     body { font-family: Arial, sans-serif; margin: 20px; }
     input, button, select { margin: 5px; }
     .vak-lijst { margin-top: 10px; }
     .vak-lijst ul { list-style-type: none; padding: 0; }
   </style>
-</head>
+<style>
+#spelernaam {
+    width: 160px;
+}
+#spelerLijst div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+}
+#spelerLijst div span {
+    display: inline-block;
+    width: 160px;
+}
+</style></head>
 <body>
-  <h1>Wedstrijd Voorbereiding</h1>
-
-  <label for="team1">Team 1:</label>
-  <input id="team1" type="text" placeholder="Naam Team 1"><br>
-
-  <label for="team2">Team 2:</label>
-  <input id="team2" type="text" placeholder="Naam Team 2"><br>
-
-  <h3>Statistiekmodus:</h3>
-  <button id="eenvoudig">Eenvoudig</button>
-  <button id="uitgebreid">Uitgebreid</button>
-
-  <h3>Spelers toevoegen aan Team 1:</h3>
-  <input id="spelernaam" type="text" placeholder="Naam speler">
-  <button id="toevoegenSpeler">Toevoegen</button>
-
-  <div id="spelerLijst"></div>
-
-  <div class="vak-lijst">
-    <h4>1e Aanvalsvak:</h4>
-    <ul id="aanvalsvak"></ul>
-
-    <h4>1e Verdedigingsvak:</h4>
-    <ul id="verdedigingsvak"></ul>
-
-    <h4>Wissels:</h4>
-    <ul id="wissels"></ul>
-  </div>
-
-  <button id="startWedstrijd">Ga naar wedstrijd</button>
-
-  <script>
+<h1>Wedstrijd Voorbereiding</h1>
+<label for="team1">Team 1:</label>
+<input id="team1" placeholder="Naam Team 1" type="text"/><br/>
+<label for="team2">Team 2:</label>
+<input id="team2" placeholder="Naam Team 2" type="text"/><br/>
+<h3>Statistiekmodus:</h3>
+<button id="eenvoudig">Eenvoudig</button>
+<button id="uitgebreid">Uitgebreid</button>
+<h3>Spelers toevoegen aan Team 1:</h3>
+<input id="spelernaam" placeholder="Naam speler" type="text"/>
+<button id="toevoegenSpeler">Toevoegen</button>
+<div id="spelerLijst"></div>
+<div class="vak-lijst">
+<h4>1e Aanvalsvak:</h4>
+<ul id="aanvalsvak"></ul>
+<h4>1e Verdedigingsvak:</h4>
+<ul id="verdedigingsvak"></ul>
+<h4>Wissels:</h4>
+<ul id="wissels"></ul>
+</div>
+<button id="startWedstrijd">Ga naar wedstrijd</button>
+<script>
     let team1 = "";
     let team2 = "";
     let statistiekModus = "";
@@ -99,7 +103,9 @@
       container.innerHTML = "";
       spelers.forEach((speler, index) => {
         const div = document.createElement("div");
-        div.textContent = speler.naam;
+        const naamSpan = document.createElement("span");
+      naamSpan.textContent = speler.naam;
+      div.appendChild(naamSpan);
 
         const select = document.createElement("select");
         select.innerHTML = `
